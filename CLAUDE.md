@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **NASAB** (نسب) is a non-profit web platform for preserving, verifying, and visualising the lineage of Prophet Muhammad (peace be upon him). Non-discriminatory (equal Sunni/Shia rigour), source-cited, verification-first, bilingual Arabic/English.
 
-See [`docs/project-overview.md`](docs/project-overview.md) for full vision and mission. Full technical specification is in `NASAB_Architecture.pdf`.
+See [`docs/project-overview.md`](docs/project-overview.md) for full vision and mission. Full technical specification is in [`docs/NASAB_Architecture.pdf`](docs/NASAB_Architecture.pdf).
 
 ## Development Commands
 
@@ -29,30 +29,69 @@ Full rationale: [`docs/tech-stack.md`](docs/tech-stack.md)
 
 ## Architecture
 
-### Folder Structure (planned)
+### Folder Structure
 ```
-app/[locale]/          # i18n routing (ar default, en secondary)
-  layout.tsx           # Sets <html lang dir>
-  (public)/tree/       # Interactive family tree
-  (auth)/dashboard/    # User dashboard
-  admin/               # Verifier/admin panel
+app/[locale]/                      # i18n routing (ar default, en secondary)
+  layout.tsx                       # Sets <html lang dir>
+  page.tsx                         # Homepage
+  (public)/
+    tree/page.tsx                  # Interactive family tree (Phase 1)
+    search/page.tsx                # Search (Phase 1)
+    person/[id]/page.tsx           # Person detail (Phase 1)
+    api/page.tsx                   # API docs (Phase 5)
+  (auth)/
+    dashboard/page.tsx             # User dashboard (Phase 3)
+    submit/page.tsx                # Submission form (Phase 3)
+    profile/page.tsx               # Profile settings (Phase 3)
+  admin/
+    submissions/page.tsx           # Verifier queue (Phase 4)
+    submissions/[id]/page.tsx      # Submission review (Phase 4)
+    tree/page.tsx                  # Tree editor (Phase 4)
+    users/page.tsx                 # Role management (Phase 4)
+    audit/page.tsx                 # Audit log (Phase 4)
+    ocr/[job_id]/page.tsx          # OCR correction UI (Phase 2)
+    analytics/page.tsx             # Analytics (Phase 7)
+app/api/
+  trpc/[trpc]/route.ts             # tRPC HTTP handler
+  v1/persons/route.ts              # REST v1 (Phase 5)
+  v1/persons/[id]/route.ts
+  v1/persons/[id]/descendants/route.ts
+  v1/search/route.ts
+  v1/branches/route.ts
+  v1/submissions/route.ts
 components/
-  tree/                # React Flow tree (TreeCanvas, PersonNode, DetailPanel, BranchFilter)
-  ui/                  # shadcn/ui components
-  forms/               # Submission, auth forms
-  admin/               # Review panels, audit log, role manager
+  tree/                            # TreeCanvas, PersonNode, EdgeRenderer, BranchFilter,
+                                   # DetailPanel, SearchOverlay, ExportButton
+  ui/                              # shadcn/ui components
+  forms/                           # SubmissionForm, LoginForm, RegisterForm
+  admin/                           # SubmissionQueue, SubmissionDetail, PDFViewer,
+                                   # AuditLogTable, RoleManager, PersonEditor
 lib/
-  supabase/            # client.ts (browser), server.ts (SSR), types.ts (generated)
-  i18n/                # config.ts, hijri.ts, arabic.ts
-  ocr/                 # vision.ts, parser.ts (Phase 2)
-server/
-  trpc/                # routers/, context.ts, middleware.ts, root.ts
-supabase/
-  migrations/          # SQL files named YYYYMMDDHHMMSS_description.sql
-  seed.sql
-messages/
-  ar.json              # Arabic (canonical — write first)
-  en.json              # English (must mirror every key in ar.json)
+  supabase/client.ts               # Browser client (anon key only)
+  supabase/server.ts               # Server client (SSR cookies)
+  supabase/types.ts                # Auto-generated — run: npx supabase gen types typescript
+  i18n/config.ts                   # next-intl config
+  i18n/hijri.ts                    # Hijri ↔ Gregorian conversion
+  i18n/arabic.ts                   # normaliseArabic, stripDiacritics, transliterate
+  ocr/vision.ts                    # Google Cloud Vision (Phase 2)
+  ocr/parser.ts                    # Urdu shajra text parser (Phase 2)
+server/trpc/
+  root.ts                          # App router
+  context.ts                       # Supabase session injection
+  middleware.ts                    # authedProcedure, verifierProcedure, adminProcedure
+  routers/persons.ts               # list, byId, create, update
+  routers/submissions.ts           # create, mySubmissions, updateStatus
+  routers/users.ts                 # me, updateProfile, updateRole
+  routers/admin.ts                 # allSubmissions, auditLog, ocrJobs
+  routers/search.ts                # fuzzy
+middleware.ts                      # i18n routing + Supabase session refresh
+messages/ar.json                   # Arabic translations (canonical — write first)
+messages/en.json                   # English translations (mirrors ar.json)
+supabase/migrations/               # SQL migrations — YYYYMMDDHHMMSS_name.sql
+supabase/seed.sql                  # Seed data (run via: npx supabase db reset)
+exports/                           # Output from /export-tree command
+docs/                              # Project documentation (see Docs Index below)
+.claude/                           # Claude Code configuration
 ```
 
 ### Database (4 core tables)
@@ -149,6 +188,7 @@ Specialised agents in `.claude/agents/` — invoke them for focused work:
 | `/translate <key> <ar> <en>` | Add/update i18n translation keys |
 | `/check-rls` | Audit all tables for RLS coverage |
 | `/digitise-shajra <path>` | Start OCR pipeline for an Urdu PDF |
+| `/self-update` | Review session learnings and update all config/docs files |
 
 ## Hooks (Automated)
 
@@ -159,7 +199,23 @@ Configured in `.claude/settings.json`, run automatically:
 | `format-lint.sh` | After any file edit | Prettier + ESLint fix |
 | `typecheck.sh` | After any `.ts`/`.tsx` edit | `tsc --noEmit` |
 | `run-tests.sh` | After any source file edit | Related tests only |
-| `auto-commit.sh` | When Claude finishes a task | `git add -A && git commit` |
+| `session-review.sh` | When Claude finishes a task | Reminds Claude to self-update docs |
+| `auto-commit.sh` | When Claude finishes a task (after review) | `git add -A && git commit` |
+
+## Self-Update Protocol
+
+After every task Claude **must** silently check whether any of the following need updating:
+
+1. **CLAUDE.md** — new commands, agents, hooks, rules, or folder changes
+2. **`.claude/agents/*.md`** — new code patterns, schemas, or tools for that domain
+3. **`.claude/commands/*.md`** — new or updated slash command workflows
+4. **`.claude/hooks/`** — new automation opportunities
+5. **`docs/*.md`** — outdated information in any doc
+6. **`docs/build-logs/phase-{n}.md`** — log what was completed in this session
+7. **`messages/ar.json` + `messages/en.json`** — any new translation keys
+
+The `session-review.sh` hook fires automatically on Stop and reminds Claude to do this.
+Run `/self-update` at any time to trigger a manual review.
 
 ## Build Phases
 

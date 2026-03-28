@@ -57,6 +57,15 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash /home/user/nasab/.claude/hooks/session-review.sh"
+          }
+        ]
+      },
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
             "command": "bash /home/user/nasab/.claude/hooks/auto-commit.sh"
           }
         ]

@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 42 43% 93%;     /* Cream #F5ECD7 */
+    --foreground: 210 60% 10%;    /* Navy #0D1B2A */
+    --primary: 42 43% 55%;        /* Gold #C9A84C */
+    --primary-foreground: 210 60% 10%;
+    --secondary: 125 55% 23%;     /* Deep Green #1B5E20 */
+    --secondary-foreground: 42 43% 93%;
+    --radius: 0.5rem;
+  }
+
+  /* Arabic body font in RTL context */
+  [dir="rtl"] body {
+    font-family: theme('fontFamily.arabic-body');
+  }
+
+  /* English body font in LTR context */
+  [dir="ltr"] body {
+    font-family: theme('fontFamily.en-body');
+  }
+}

@@ -2,7 +2,7 @@
 // Phase 1 — Client wrapper for the interactive family tree page
 // Manages: layout worker, branch filter state, detail panel, search overlay, export
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useReactFlow, ReactFlowProvider } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
@@ -45,16 +45,13 @@ function TreePageClientInner({ persons }: TreePageClientInnerProps): JSX.Element
   useEffect(() => {
     // Filter persons by active branches
     // Persons with null branch are always shown (e.g. the root Prophet ﷺ)
-    const filtered = persons.filter(
-      (p) => p.branch === null || activeBranches.includes(p.branch),
-    )
+    const filtered = persons.filter((p) => p.branch === null || activeBranches.includes(p.branch))
 
     // Create or reuse worker
     if (!workerRef.current) {
-      workerRef.current = new Worker(
-        new URL('/workers/layout.worker.ts', import.meta.url),
-        { type: 'module' },
-      )
+      workerRef.current = new Worker(new URL('/workers/layout.worker.ts', import.meta.url), {
+        type: 'module',
+      })
     }
 
     const worker = workerRef.current
@@ -98,7 +95,7 @@ function TreePageClientInner({ persons }: TreePageClientInnerProps): JSX.Element
       const person = persons.find((p) => p.id === personId) ?? null
       setSelectedPerson(person)
     },
-    [persons],
+    [persons]
   )
 
   const handleSearchSelect = useCallback(
@@ -112,7 +109,7 @@ function TreePageClientInner({ persons }: TreePageClientInnerProps): JSX.Element
         setCenter(node.position.x, node.position.y, { zoom: 1.2, duration: 600 })
       }
     },
-    [nodes, setCenter],
+    [nodes, setCenter]
   )
 
   return (
@@ -132,11 +129,24 @@ function TreePageClientInner({ persons }: TreePageClientInnerProps): JSX.Element
             className="flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
             aria-label="Open search"
           >
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+            <svg
+              className="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
+              />
             </svg>
             Search
-            <kbd className="rounded border border-gray-200 px-1 py-0.5 text-[9px] text-gray-400">⌘K</kbd>
+            <kbd className="rounded border border-gray-200 px-1 py-0.5 text-[9px] text-gray-400">
+              ⌘K
+            </kbd>
           </button>
 
           <ExportButton treeContainerRef={treeContainerRef} filename="nasab-tree.png" />
@@ -147,7 +157,7 @@ function TreePageClientInner({ persons }: TreePageClientInnerProps): JSX.Element
       <div className="flex flex-1 overflow-hidden">
         {/* Branch filter sidebar */}
         <aside className="w-32 flex-shrink-0 border-e border-gray-200 bg-white p-3 shadow-sm md:w-36">
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+          <p className="mb-2 text-[10px] font-semibold tracking-wide text-gray-400 uppercase">
             Branches
           </p>
           <BranchFilter activeBranches={activeBranches} onChange={setActiveBranches} />

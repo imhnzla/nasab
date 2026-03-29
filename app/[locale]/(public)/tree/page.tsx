@@ -2,6 +2,7 @@
 // Public route: /[locale]/tree
 // Server component: fetches verified persons, passes to client wrapper
 
+import React from 'react'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import type { PersonRow } from '@/lib/tree/types'
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function TreePage(): Promise<JSX.Element> {
+export default async function TreePage(): Promise<React.ReactElement> {
   const supabase = await createClient()
 
   const { data, error } = await supabase

@@ -2,7 +2,7 @@
 // Phase 1 — Custom @xyflow/react edge with directional arrow markers
 // Renders parent→child relationship lines in a neutral gray
 
-import { memo } from 'react'
+import React, { memo } from 'react'
 import { getBezierPath, EdgeLabelRenderer, BaseEdge } from '@xyflow/react'
 import type { EdgeProps } from '@xyflow/react'
 
@@ -16,7 +16,7 @@ function EdgeRendererInner({
   targetPosition,
   markerEnd,
   style,
-}: EdgeProps): JSX.Element | null {
+}: EdgeProps): React.ReactElement | null {
   const [edgePath] = getBezierPath({
     sourceX,
     sourceY,

@@ -2,7 +2,7 @@
 // Phase 1 — Fuzzy search overlay with Arabic diacritic-insensitive matching
 // Keyboard: Cmd/Ctrl+K to open, Escape to close
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import type { PersonRow } from '@/lib/tree/types'
 import { BRANCH_COLOURS } from '@/lib/tree/types'
 import { trpc } from '@/lib/trpc/client'
@@ -14,7 +14,11 @@ export type SearchOverlayProps = {
   onClose: () => void
 }
 
-export function SearchOverlay({ isOpen, onSelect, onClose }: SearchOverlayProps): JSX.Element | null {
+export function SearchOverlay({
+  isOpen,
+  onSelect,
+  onClose,
+}: SearchOverlayProps): React.ReactElement | null {
   const [query, setQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -62,7 +66,7 @@ export function SearchOverlay({ isOpen, onSelect, onClose }: SearchOverlayProps)
     {
       enabled: preparedQuery.length >= 1,
       placeholderData: [],
-    },
+    }
   )
 
   const handleSelect = useCallback(
@@ -70,7 +74,7 @@ export function SearchOverlay({ isOpen, onSelect, onClose }: SearchOverlayProps)
       onSelect(person)
       onClose()
     },
-    [onSelect, onClose],
+    [onSelect, onClose]
   )
 
   if (!isOpen) return null
@@ -83,11 +87,7 @@ export function SearchOverlay({ isOpen, onSelect, onClose }: SearchOverlayProps)
       aria-label="Search persons"
     >
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/40"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
 
       {/* Modal card */}
       <div className="relative z-10 flex max-h-[70vh] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
@@ -134,11 +134,7 @@ export function SearchOverlay({ isOpen, onSelect, onClose }: SearchOverlayProps)
                 stroke="currentColor"
                 strokeWidth="4"
               />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v8H4z"
-              />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
             </svg>
           )}
 
@@ -150,9 +146,7 @@ export function SearchOverlay({ isOpen, onSelect, onClose }: SearchOverlayProps)
         {/* Results */}
         <ul className="overflow-y-auto" role="listbox">
           {results.length === 0 && preparedQuery.length > 0 && !isFetching && (
-            <li className="px-4 py-6 text-center text-sm text-gray-500">
-              No results found
-            </li>
+            <li className="px-4 py-6 text-center text-sm text-gray-500">No results found</li>
           )}
 
           {results.length === 0 && preparedQuery.length === 0 && (

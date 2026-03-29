@@ -1,7 +1,7 @@
 'use client'
 // Phase 1 — Root @xyflow/react wrapper with zoom/pan, background, controls, minimap
 
-import { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import {
   ReactFlow,
   Background,
@@ -34,7 +34,11 @@ const defaultEdgeOptions = {
   markerEnd: { type: MarkerType.ArrowClosed, color: '#9CA3AF', width: 16, height: 16 },
 }
 
-export function TreeCanvas({ nodes: initialNodes, edges: initialEdges, onNodeClick }: TreeCanvasProps): JSX.Element {
+export function TreeCanvas({
+  nodes: initialNodes,
+  edges: initialEdges,
+  onNodeClick,
+}: TreeCanvasProps): React.ReactElement {
   const [nodes, setNodes, onNodesChange] = useNodesState<PersonFlowNode>(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState<FamilyEdge>(initialEdges)
 
@@ -49,14 +53,14 @@ export function TreeCanvas({ nodes: initialNodes, edges: initialEdges, onNodeCli
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges],
+    [setEdges]
   )
 
   const handleNodeClick: NodeMouseHandler<PersonFlowNode> = useCallback(
     (_event, node) => {
       onNodeClick?.(node.id)
     },
-    [onNodeClick],
+    [onNodeClick]
   )
 
   const proOptions = useMemo(() => ({ hideAttribution: false }), [])

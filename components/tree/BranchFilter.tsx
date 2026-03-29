@@ -1,6 +1,7 @@
 'use client'
 // Phase 1 — Sidebar with toggle buttons for Hasanid / Husaynid / Hashemite branches
 
+import React from 'react'
 import type { Branch } from '@/lib/tree/types'
 import { BRANCH_COLOURS } from '@/lib/tree/types'
 
@@ -23,7 +24,7 @@ const BRANCHES: BranchConfig[] = [
 
 const ALL_BRANCHES: Branch[] = ['hasanid', 'husaynid', 'hashemite']
 
-export function BranchFilter({ activeBranches, onChange }: BranchFilterProps): JSX.Element {
+export function BranchFilter({ activeBranches, onChange }: BranchFilterProps): React.ReactElement {
   const allActive = ALL_BRANCHES.every((b) => activeBranches.includes(b))
 
   function handleAllToggle(): void {

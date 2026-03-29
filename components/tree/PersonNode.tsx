@@ -3,13 +3,13 @@
 // Displays: Arabic name (primary), English name (secondary), branch colour border,
 // generation badge, verified checkmark
 
-import { memo } from 'react'
+import React, { memo } from 'react'
 import { Handle, Position } from '@xyflow/react'
 import type { NodeProps } from '@xyflow/react'
 import type { PersonFlowNode } from '@/lib/tree/types'
 import { BRANCH_COLOURS } from '@/lib/tree/types'
 
-function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): JSX.Element {
+function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): React.ReactElement {
   const { person } = data
   const branchColour = person.branch ? BRANCH_COLOURS[person.branch] : '#6B7280'
 
@@ -41,7 +41,7 @@ function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): JSX.Ele
         {/* Verified checkmark */}
         {person.is_verified && (
           <span
-            className="absolute bottom-1 end-1.5 text-[10px] font-bold"
+            className="absolute end-1.5 bottom-1 text-[10px] font-bold"
             style={{ color: branchColour }}
             aria-label="Verified"
           >
@@ -52,7 +52,7 @@ function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): JSX.Ele
         {/* Arabic name — primary */}
         <p
           dir="rtl"
-          className="truncate text-right text-sm font-bold leading-tight text-gray-900"
+          className="truncate text-right text-sm leading-tight font-bold text-gray-900"
           title={person.name_ar}
         >
           {person.name_ar}

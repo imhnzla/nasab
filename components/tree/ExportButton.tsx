@@ -2,7 +2,7 @@
 // Phase 1 — PNG export button using html-to-image at 2× resolution
 // Captures the ReactFlow canvas container ref
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import type { RefObject } from 'react'
 import { toPng } from 'html-to-image'
 
@@ -11,7 +11,10 @@ export type ExportButtonProps = {
   filename?: string
 }
 
-export function ExportButton({ treeContainerRef, filename = 'nasab-tree.png' }: ExportButtonProps): JSX.Element {
+export function ExportButton({
+  treeContainerRef,
+  filename = 'nasab-tree.png',
+}: ExportButtonProps): React.ReactElement {
   const [isExporting, setIsExporting] = useState(false)
 
   async function handleExport(): Promise<void> {

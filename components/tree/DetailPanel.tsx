@@ -1,6 +1,7 @@
 'use client'
 // Phase 1 — Slide-in panel showing full biography when a tree node is clicked
 
+import React from 'react'
 import { useLocale } from 'next-intl'
 import type { PersonRow } from '@/lib/tree/types'
 import { BRANCH_COLOURS } from '@/lib/tree/types'
@@ -19,8 +20,7 @@ type SourceEntry = {
 function parseSources(sources: unknown): SourceEntry[] {
   if (!Array.isArray(sources)) return []
   return sources.filter(
-    (s): s is SourceEntry =>
-      typeof s === 'object' && s !== null && 'title' in s,
+    (s): s is SourceEntry => typeof s === 'object' && s !== null && 'title' in s
   )
 }
 
@@ -30,7 +30,7 @@ function formatDate(hijri: string | null, gregorian: string | null): string | nu
   return null
 }
 
-export function DetailPanel({ person, onClose }: DetailPanelProps): JSX.Element | null {
+export function DetailPanel({ person, onClose }: DetailPanelProps): React.ReactElement | null {
   const locale = useLocale()
 
   if (!person) return null
@@ -69,11 +69,7 @@ export function DetailPanel({ person, onClose }: DetailPanelProps): JSX.Element 
       aria-label={person.name_en}
     >
       {/* Semi-transparent backdrop — click to close */}
-      <div
-        className="absolute inset-0 bg-black/20"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="absolute inset-0 bg-black/20" onClick={onClose} aria-hidden="true" />
 
       {/* Panel */}
       <div
@@ -84,14 +80,11 @@ export function DetailPanel({ person, onClose }: DetailPanelProps): JSX.Element 
       >
         {/* Header */}
         <div
-          className="flex items-start justify-between px-4 pb-3 pt-4"
+          className="flex items-start justify-between px-4 pt-4 pb-3"
           style={{ borderBottom: `3px solid ${branchColour}` }}
         >
           <div className="flex-1 overflow-hidden">
-            <h2
-              dir="rtl"
-              className="text-xl font-bold leading-tight text-gray-900"
-            >
+            <h2 dir="rtl" className="text-xl leading-tight font-bold text-gray-900">
               {person.name_ar}
             </h2>
             <p className="mt-0.5 truncate text-sm text-gray-500">{person.name_en}</p>
@@ -100,7 +93,7 @@ export function DetailPanel({ person, onClose }: DetailPanelProps): JSX.Element 
           <button
             type="button"
             onClick={onClose}
-            className="ms-2 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="ms-2 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none"
             aria-label="Close panel"
           >
             ×
@@ -194,9 +187,7 @@ export function DetailPanel({ person, onClose }: DetailPanelProps): JSX.Element 
                       ) : (
                         src.title
                       )}
-                      {src.author && (
-                        <span className="text-gray-500"> — {src.author}</span>
-                      )}
+                      {src.author && <span className="text-gray-500"> — {src.author}</span>}
                     </span>
                   </li>
                 ))}

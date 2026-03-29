@@ -1,10 +1,49 @@
 'use client'
 // Phase 1 — Custom @xyflow/react edge with directional arrow markers
-// Renders parent→child relationship lines; uses branch colour of child node
+// Renders parent→child relationship lines in a neutral gray
 
+import { memo } from 'react'
+import { getBezierPath, EdgeLabelRenderer, BaseEdge } from '@xyflow/react'
 import type { EdgeProps } from '@xyflow/react'
 
-export function EdgeRenderer(_props: EdgeProps): JSX.Element | null {
-  // TODO: Phase 1 — render SVG path with arrow marker in branch colour
-  return null
+function EdgeRendererInner({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  markerEnd,
+  style,
+}: EdgeProps): JSX.Element | null {
+  const [edgePath] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  })
+
+  return (
+    <>
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        markerEnd={markerEnd}
+        style={{
+          stroke: '#9CA3AF',
+          strokeWidth: 1.5,
+          ...style,
+        }}
+      />
+      {/* EdgeLabelRenderer is required by @xyflow/react even if unused */}
+      <EdgeLabelRenderer>
+        <></>
+      </EdgeLabelRenderer>
+    </>
+  )
 }
+
+export const EdgeRenderer = memo(EdgeRendererInner)

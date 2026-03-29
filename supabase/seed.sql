@@ -38,7 +38,7 @@ INSERT INTO persons (
   'محمد بن عبد الله',
   'Muhammad ibn Abdullah',
   NULL, NULL, 'both', 1,
-  '53 BH', '11 AH', 'c. 570 CE', '632 CE',
+  '53 BH', '11 AH', '0570-01-01', '0632-01-01',
   '[{"title":"Al-Sira al-Nabawiyya","author":"Ibn Hisham","type":"classical_text"},{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Bidaya wal-Nihaya","author":"Ibn Kathir","type":"classical_text"}]'::jsonb,
   '[{"title":"النبي","title_en":"The Prophet"},{"title":"المصطفى","title_en":"The Chosen One"},{"title":"رسول الله","title_en":"Messenger of God"},{"title":"خاتم الأنبياء","title_en":"Seal of the Prophets"}]'::jsonb,
   true
@@ -57,7 +57,7 @@ INSERT INTO persons (
   'Fatimah al-Zahra bint Muhammad',
   '00000000-0000-0000-0000-000000000001',
   NULL, 'both', 2,
-  'c. 5 BH', '11 AH', 'c. 615 CE', '632 CE',
+  'c. 5 BH', '11 AH', '0615-01-01', '0632-01-01',
   '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"}]'::jsonb,
   '[{"title":"الزهراء","title_en":"The Radiant"},{"title":"سيدة نساء أهل الجنة","title_en":"Lady of the Women of Paradise"},{"title":"البتول","title_en":"The Pure"}]'::jsonb,
   true
@@ -76,7 +76,7 @@ INSERT INTO persons (
   'Ali ibn Abi Talib',
   NULL,
   'hashemite', 'both', 2,
-  'c. 23 BH', '40 AH', 'c. 600 CE', '661 CE',
+  'c. 23 BH', '40 AH', '0600-01-01', '0661-01-01',
   '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"},{"title":"Al-Bidaya wal-Nihaya","author":"Ibn Kathir","type":"classical_text"}]'::jsonb,
   '[{"title":"أمير المؤمنين","title_en":"Commander of the Faithful"},{"title":"الإمام الأول","title_en":"First Imam (Shia)"},{"title":"الخليفة الرابع","title_en":"Fourth Caliph (Sunni)"},{"title":"أسد الله","title_en":"Lion of God"}]'::jsonb,
   true
@@ -99,7 +99,7 @@ INSERT INTO persons (
   'Al-Hasan ibn Ali',
   '00000000-0000-0000-0000-000000000002',
   'hasanid', 'both', 3,
-  '3 AH', '50 AH', '625 CE', '670 CE',
+  '3 AH', '50 AH', '0625-01-01', '0670-01-01',
   '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"}]'::jsonb,
   '[{"title":"الإمام الثاني","title_en":"Second Imam (Shia)"},{"title":"المجتبى","title_en":"The Chosen"},{"title":"سيد شباب أهل الجنة","title_en":"Master of Youth of Paradise"}]'::jsonb,
   true
@@ -115,7 +115,7 @@ INSERT INTO persons (
   'Al-Husayn ibn Ali',
   '00000000-0000-0000-0000-000000000002',
   'husaynid', 'both', 3,
-  '4 AH', '61 AH', '626 CE', '680 CE',
+  '4 AH', '61 AH', '0626-01-01', '0680-01-01',
   '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Tarikh al-Tabari","author":"al-Tabari","type":"classical_text"},{"title":"Al-Bidaya wal-Nihaya","author":"Ibn Kathir","type":"classical_text"}]'::jsonb,
   '[{"title":"الإمام الثالث","title_en":"Third Imam (Shia)"},{"title":"سيد الشهداء","title_en":"Master of Martyrs"},{"title":"أبو الأحرار","title_en":"Father of the Free"}]'::jsonb,
   true
@@ -134,7 +134,7 @@ INSERT INTO persons (
   'Al-Hasan al-Muthanna ibn al-Hasan',
   '00000000-0000-0000-0000-000000000004',
   'hasanid', 'both', 4,
-  'c. 36 AH', 'c. 97 AH', 'c. 657 CE', 'c. 716 CE',
+  'c. 36 AH', 'c. 97 AH', '0657-01-01', '0716-01-01',
   '[{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"},{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"}]'::jsonb,
   '[{"title":"المثنى","title_en":"The Second (named after his grandfather)"}]'::jsonb,
   true
@@ -150,7 +150,7 @@ INSERT INTO persons (
   'Zayd ibn al-Hasan',
   '00000000-0000-0000-0000-000000000004',
   'hasanid', 'both', 4,
-  'c. 36 AH', 'c. 99 AH', 'c. 657 CE', 'c. 718 CE',
+  'c. 36 AH', 'c. 99 AH', '0657-01-01', '0718-01-01',
   '[{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"},{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"}]'::jsonb,
   '[]'::jsonb,
   true
@@ -166,7 +166,7 @@ INSERT INTO persons (
   'Amr ibn al-Hasan',
   '00000000-0000-0000-0000-000000000004',
   'hasanid', 'both', 4,
-  'c. 36 AH', NULL, 'c. 657 CE', NULL,
+  'c. 36 AH', NULL, '0657-01-01', NULL,
   '[{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"}]'::jsonb,
   '[]'::jsonb,
   true
@@ -185,7 +185,7 @@ INSERT INTO persons (
   'Ali ibn al-Husayn Zayn al-Abidin',
   '00000000-0000-0000-0000-000000000005',
   'husaynid', 'both', 4,
-  '38 AH', '95 AH', '659 CE', '713 CE',
+  '38 AH', '95 AH', '0659-01-01', '0713-01-01',
   '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"}]'::jsonb,
   '[{"title":"زين العابدين","title_en":"Ornament of the Worshippers"},{"title":"السجاد","title_en":"The Prostrator"},{"title":"الإمام الرابع","title_en":"Fourth Imam (Shia)"}]'::jsonb,
   true
@@ -204,7 +204,7 @@ INSERT INTO persons (
   'Abdullah al-Kamil ibn al-Hasan al-Muthanna',
   '00000000-0000-0000-0000-000000000006',
   'hasanid', 'both', 5,
-  'c. 72 AH', '145 AH', 'c. 691 CE', '762 CE',
+  'c. 72 AH', '145 AH', '0691-01-01', '0762-01-01',
   '[{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"},{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"}]'::jsonb,
   '[{"title":"الكامل","title_en":"The Complete / The Perfect"}]'::jsonb,
   true
@@ -220,7 +220,7 @@ INSERT INTO persons (
   'Ibrahim ibn al-Hasan al-Muthanna',
   '00000000-0000-0000-0000-000000000006',
   'hasanid', 'both', 5,
-  'c. 74 AH', '145 AH', 'c. 693 CE', '762 CE',
+  'c. 74 AH', '145 AH', '0693-01-01', '0762-01-01',
   '[{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"},{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"}]'::jsonb,
   '[]'::jsonb,
   true
@@ -239,7 +239,7 @@ INSERT INTO persons (
   'Muhammad ibn Ali al-Baqir',
   '00000000-0000-0000-0000-000000000009',
   'husaynid', 'both', 5,
-  '57 AH', '114 AH', '677 CE', '732 CE',
+  '57 AH', '114 AH', '0677-01-01', '0732-01-01',
   '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"},{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"}]'::jsonb,
   '[{"title":"الباقر","title_en":"The Splitter of Knowledge"},{"title":"الإمام الخامس","title_en":"Fifth Imam (Shia)"}]'::jsonb,
   true
@@ -255,7 +255,7 @@ INSERT INTO persons (
   'Zayd ibn Ali al-Shahid',
   '00000000-0000-0000-0000-000000000009',
   'husaynid', 'both', 5,
-  '75 AH', '122 AH', '694 CE', '740 CE',
+  '75 AH', '122 AH', '0694-01-01', '0740-01-01',
   '[{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"},{"title":"Tarikh al-Tabari","author":"al-Tabari","type":"classical_text"},{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"}]'::jsonb,
   '[{"title":"الشهيد","title_en":"The Martyr"},{"title":"إمام الزيدية","title_en":"Imam of the Zaydis"}]'::jsonb,
   true
@@ -271,7 +271,7 @@ INSERT INTO persons (
   'Umar al-Ashraf ibn Ali Zayn al-Abidin',
   '00000000-0000-0000-0000-000000000009',
   'husaynid', 'both', 5,
-  'c. 65 AH', 'c. 110 AH', 'c. 685 CE', 'c. 728 CE',
+  'c. 65 AH', 'c. 110 AH', '0685-01-01', '0728-01-01',
   '[{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"}]'::jsonb,
   '[{"title":"الأشرف","title_en":"The Most Noble"}]'::jsonb,
   true
@@ -287,7 +287,7 @@ INSERT INTO persons (
   'Al-Husayn al-Asghar ibn Ali Zayn al-Abidin',
   '00000000-0000-0000-0000-000000000009',
   'husaynid', 'both', 5,
-  'c. 63 AH', 'c. 100 AH', 'c. 683 CE', 'c. 718 CE',
+  'c. 63 AH', 'c. 100 AH', '0683-01-01', '0718-01-01',
   '[{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"}]'::jsonb,
   '[]'::jsonb,
   true
@@ -306,7 +306,7 @@ INSERT INTO persons (
   'Muhammad al-Nafs al-Zakiyya ibn Abdullah',
   '00000000-0000-0000-0000-000000000010',
   'hasanid', 'both', 6,
-  'c. 100 AH', '145 AH', 'c. 718 CE', '762 CE',
+  'c. 100 AH', '145 AH', '0718-01-01', '0762-01-01',
   '[{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"},{"title":"Tarikh al-Tabari","author":"al-Tabari","type":"classical_text"}]'::jsonb,
   '[{"title":"النفس الزكية","title_en":"The Pure Soul"},{"title":"الشهيد","title_en":"The Martyr"}]'::jsonb,
   true
@@ -322,7 +322,7 @@ INSERT INTO persons (
   'Ibrahim ibn Abdullah al-Kamil',
   '00000000-0000-0000-0000-000000000010',
   'hasanid', 'both', 6,
-  'c. 104 AH', '145 AH', 'c. 722 CE', '762 CE',
+  'c. 104 AH', '145 AH', '0722-01-01', '0762-01-01',
   '[{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"},{"title":"Tarikh al-Tabari","author":"al-Tabari","type":"classical_text"}]'::jsonb,
   '[{"title":"الشهيد","title_en":"The Martyr (killed at Bakhamra)"}]'::jsonb,
   true
@@ -338,7 +338,7 @@ INSERT INTO persons (
   'Idris ibn Abdullah al-Kamil',
   '00000000-0000-0000-0000-000000000010',
   'hasanid', 'both', 6,
-  'c. 106 AH', '177 AH', 'c. 724 CE', '793 CE',
+  'c. 106 AH', '177 AH', '0724-01-01', '0793-01-01',
   '[{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"},{"title":"Al-Bayan al-Mughrib","author":"Ibn Idhari al-Marrakushi","type":"classical_text"}]'::jsonb,
   '[{"title":"إدريس الأول","title_en":"Idris I"},{"title":"مؤسس الدولة الإدريسية","title_en":"Founder of the Idrisid Dynasty (Morocco)"}]'::jsonb,
   true
@@ -354,7 +354,7 @@ INSERT INTO persons (
   'Yahya ibn Abdullah al-Kamil',
   '00000000-0000-0000-0000-000000000010',
   'hasanid', 'both', 6,
-  'c. 108 AH', 'c. 186 AH', 'c. 726 CE', 'c. 802 CE',
+  'c. 108 AH', 'c. 186 AH', '0726-01-01', '0802-01-01',
   '[{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"}]'::jsonb,
   '[]'::jsonb,
   true
@@ -373,7 +373,7 @@ INSERT INTO persons (
   'Jafar ibn Muhammad al-Sadiq',
   '00000000-0000-0000-0000-000000000012',
   'husaynid', 'both', 6,
-  '83 AH', '148 AH', '702 CE', '765 CE',
+  '83 AH', '148 AH', '0702-01-01', '0765-01-01',
   '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Tarikh al-Tabari","author":"al-Tabari","type":"classical_text"}]'::jsonb,
   '[{"title":"الصادق","title_en":"The Truthful"},{"title":"الإمام السادس","title_en":"Sixth Imam (Shia)"}]'::jsonb,
   true
@@ -389,7 +389,7 @@ INSERT INTO persons (
   'Yahya ibn Zayd al-Shahid',
   '00000000-0000-0000-0000-000000000013',
   'husaynid', 'both', 6,
-  'c. 105 AH', '125 AH', 'c. 723 CE', '743 CE',
+  'c. 105 AH', '125 AH', '0723-01-01', '0743-01-01',
   '[{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"},{"title":"Tarikh al-Tabari","author":"al-Tabari","type":"classical_text"}]'::jsonb,
   '[{"title":"الشهيد","title_en":"The Martyr (killed in Khurasan)"}]'::jsonb,
   true
@@ -408,7 +408,7 @@ INSERT INTO persons (
   'Idris ibn Idris',
   '00000000-0000-0000-0000-000000000018',
   'hasanid', 'both', 7,
-  '172 AH', '213 AH', '789 CE', '828 CE',
+  '172 AH', '213 AH', '0789-01-01', '0828-01-01',
   '[{"title":"Al-Bayan al-Mughrib","author":"Ibn Idhari al-Marrakushi","type":"classical_text"},{"title":"Kitab al-Istibsar","author":"Ibn al-Qattan al-Fasi","type":"classical_text"}]'::jsonb,
   '[{"title":"إدريس الثاني","title_en":"Idris II"},{"title":"مؤسس مدينة فاس","title_en":"Founder of the City of Fes"}]'::jsonb,
   true
@@ -427,7 +427,7 @@ INSERT INTO persons (
   'Musa ibn Jafar al-Kazim',
   '00000000-0000-0000-0000-000000000020',
   'husaynid', 'both', 7,
-  '128 AH', '183 AH', '745 CE', '799 CE',
+  '128 AH', '183 AH', '0745-01-01', '0799-01-01',
   '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"},{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"}]'::jsonb,
   '[{"title":"الكاظم","title_en":"The Restrainer of Anger"},{"title":"الإمام السابع","title_en":"Seventh Imam (Shia)"},{"title":"باب الحوائج","title_en":"Gateway of Needs"}]'::jsonb,
   true
@@ -443,7 +443,7 @@ INSERT INTO persons (
   'Ismail ibn Jafar',
   '00000000-0000-0000-0000-000000000020',
   'husaynid', 'both', 7,
-  'c. 103 AH', 'c. 138 AH', 'c. 721 CE', 'c. 755 CE',
+  'c. 103 AH', 'c. 138 AH', '0721-01-01', '0755-01-01',
   '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"}]'::jsonb,
   '[{"title":"إمام الإسماعيلية","title_en":"Eponymous Imam of the Ismaili branch"}]'::jsonb,
   true
@@ -459,7 +459,7 @@ INSERT INTO persons (
   'Muhammad al-Dibaj ibn Jafar',
   '00000000-0000-0000-0000-000000000020',
   'husaynid', 'both', 7,
-  'c. 110 AH', 'c. 203 AH', 'c. 728 CE', 'c. 818 CE',
+  'c. 110 AH', 'c. 203 AH', '0728-01-01', '0818-01-01',
   '[{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"}]'::jsonb,
   '[{"title":"الديباج","title_en":"The Brocade (a title for his beauty)"}]'::jsonb,
   true
@@ -475,7 +475,7 @@ INSERT INTO persons (
   'Abdullah al-Aftah ibn Jafar',
   '00000000-0000-0000-0000-000000000020',
   'husaynid', 'both', 7,
-  'c. 112 AH', 'c. 149 AH', 'c. 730 CE', 'c. 766 CE',
+  'c. 112 AH', 'c. 149 AH', '0730-01-01', '0766-01-01',
   '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"}]'::jsonb,
   '[{"title":"الأفطح","title_en":"The Broad-Headed"}]'::jsonb,
   true
@@ -494,7 +494,7 @@ INSERT INTO persons (
   'Muhammad ibn Idris ibn Idris',
   '00000000-0000-0000-0000-000000000022',
   'hasanid', 'both', 8,
-  'c. 197 AH', 'c. 221 AH', 'c. 812 CE', 'c. 836 CE',
+  'c. 197 AH', 'c. 221 AH', '0812-01-01', '0836-01-01',
   '[{"title":"Al-Bayan al-Mughrib","author":"Ibn Idhari al-Marrakushi","type":"classical_text"}]'::jsonb,
   '[{"title":"محمد الثاني من الأدارسة","title_en":"Muhammad II of the Idrisid Dynasty"}]'::jsonb,
   true
@@ -513,7 +513,7 @@ INSERT INTO persons (
   'Ali ibn Musa al-Ridha',
   '00000000-0000-0000-0000-000000000023',
   'husaynid', 'both', 8,
-  '148 AH', '203 AH', '765 CE', '818 CE',
+  '148 AH', '203 AH', '0765-01-01', '0818-01-01',
   '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"},{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"}]'::jsonb,
   '[{"title":"الرضا","title_en":"The Pleased / The Pleasing"},{"title":"الإمام الثامن","title_en":"Eighth Imam (Shia)"}]'::jsonb,
   true
@@ -529,7 +529,7 @@ INSERT INTO persons (
   'Ahmad ibn Musa',
   '00000000-0000-0000-0000-000000000023',
   'husaynid', 'both', 8,
-  'c. 150 AH', 'c. 202 AH', 'c. 767 CE', 'c. 817 CE',
+  'c. 150 AH', 'c. 202 AH', '0767-01-01', '0817-01-01',
   '[{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"},{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"}]'::jsonb,
   '[{"title":"شاه چراغ","title_en":"Shah Cheragh — Shah of the Lamp (revered in Shiraz)"}]'::jsonb,
   true
@@ -545,7 +545,7 @@ INSERT INTO persons (
   'Ibrahim ibn Musa al-Kazim',
   '00000000-0000-0000-0000-000000000023',
   'husaynid', 'both', 8,
-  'c. 152 AH', 'c. 210 AH', 'c. 769 CE', 'c. 825 CE',
+  'c. 152 AH', 'c. 210 AH', '0769-01-01', '0825-01-01',
   '[{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"}]'::jsonb,
   '[]'::jsonb,
   true

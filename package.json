@@ -3,7 +3,33 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20.9.0"
+    "node": "22.x"
+  },
+  "overrides": {
+    "@typescript-eslint/parser": {
+      "typescript": "$typescript"
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "typescript": "$typescript"
+    },
+    "@typescript-eslint/utils": {
+      "typescript": "$typescript"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "typescript": "$typescript"
+    },
+    "@typescript-eslint/type-utils": {
+      "typescript": "$typescript"
+    },
+    "typescript-eslint": {
+      "typescript": "$typescript"
+    },
+    "next-intl": {
+      "typescript": "$typescript"
+    },
+    "ts-jest": {
+      "typescript": "$typescript"
+    }
   },
   "scripts": {
     "dev": "next dev",

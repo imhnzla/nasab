@@ -23,7 +23,7 @@ npx supabase migration new <name>
 
 ## Technology Stack
 
-Next.js 16.2 (App Router, async params) · React 19.2 · TypeScript 6.0 (strict) · Tailwind CSS v4.1 (CSS-first, no tailwind.config.ts) · shadcn/ui · next-intl 4.8 · tRPC 11 · Zod 4.3 · Supabase (PostgreSQL, Auth, Storage) · @xyflow/react 12 + D3.js 7 · Resend 6 · Google Cloud Vision · Vercel
+Next.js 16.2.1 (App Router, async params) · React 19.2 · TypeScript 6.0 (strict) · Tailwind CSS v4.1 (CSS-first, no tailwind.config.ts) · shadcn/ui · next-intl 4.8 · tRPC 11 · Zod 4.3 · Supabase (PostgreSQL, Auth, Storage) · @xyflow/react 12 + D3.js 7 · Resend 6 · Google Cloud Vision · Vercel
 
 Full rationale: [`docs/tech-stack.md`](docs/tech-stack.md)
 
@@ -89,7 +89,7 @@ server/trpc/
   routers/users.ts                 # me, updateProfile, updateRole
   routers/admin.ts                 # allSubmissions, auditLog, ocrJobs
   routers/search.ts                # fuzzy
-middleware.ts                      # i18n routing + Supabase session refresh
+proxy.ts                           # i18n routing + Supabase session refresh
 messages/ar.json                   # Arabic translations (canonical — write first)
 messages/en.json                   # English translations (mirrors ar.json)
 supabase/migrations/               # SQL migrations — YYYYMMDDHHMMSS_name.sql

@@ -19,7 +19,7 @@ Eight sequential phases. Each phase is fully deployed to production before the n
 - [x] Write and apply initial database migrations (persons, users, audit_log)
 - [x] Enable RLS on all tables with base policies
 - [x] Configure Supabase Auth (email + Google) — callback route added; OAuth providers enabled in Supabase dashboard (manual)
-- [x] Set up `middleware.ts` for i18n + auth session refresh
+- [x] Set up `proxy.ts` for i18n + auth session refresh (Next.js 16.2 renamed middleware → proxy)
 - [ ] Configure environment variables on Vercel — **manual: copy from `.env.local.example`**
 - [ ] Deploy and verify blank homepage renders in Arabic and English — **manual: after Vercel deploy**
 - [x] Seed database with Prophet Muhammad (pbuh) as root node — `supabase/seed.sql` ready

@@ -8,19 +8,19 @@ Eight sequential phases. Each phase is fully deployed to production before the n
 **Goal:** Working deployment with empty tree.
 
 ### Tasks
-- [ ] Register domain (nasab.org or nasab.app)
-- [ ] Create Supabase project (production + local dev)
-- [ ] Create Vercel project and connect GitHub repo
-- [ ] Scaffold Next.js 16 project with TypeScript, Tailwind CSS v4, shadcn/ui
-- [ ] Configure next-intl for Arabic (default) and English
-- [ ] Set up `app/[locale]/` routing structure
-- [ ] Write and apply initial database migrations (persons, users, audit_log)
-- [ ] Enable RLS on all tables with base policies
-- [ ] Configure Supabase Auth (email + Google)
-- [ ] Set up `middleware.ts` for i18n + auth session refresh
-- [ ] Configure environment variables on Vercel
-- [ ] Deploy and verify blank homepage renders in Arabic and English
-- [ ] Seed database with Prophet Muhammad (pbuh) as root node
+- [ ] Register domain (nasab.org or nasab.app) — **manual: buy domain**
+- [ ] Create Supabase project (production + local dev) — **manual: supabase.com**
+- [ ] Create Vercel project and connect GitHub repo — **manual: vercel.com**
+- [x] Scaffold Next.js 16 project with TypeScript, Tailwind CSS v4, shadcn/ui
+- [x] Configure next-intl for Arabic (default) and English
+- [x] Set up `app/[locale]/` routing structure
+- [x] Write and apply initial database migrations (persons, users, audit_log)
+- [x] Enable RLS on all tables with base policies
+- [x] Configure Supabase Auth (email + Google) — callback route added; OAuth providers enabled in Supabase dashboard (manual)
+- [x] Set up `middleware.ts` for i18n + auth session refresh
+- [ ] Configure environment variables on Vercel — **manual: copy from `.env.local.example`**
+- [ ] Deploy and verify blank homepage renders in Arabic and English — **manual: after Vercel deploy**
+- [x] Seed database with Prophet Muhammad (pbuh) as root node — `supabase/seed.sql` ready
 
 **Deliverable:** Live URL showing a blank bilingual homepage.
 

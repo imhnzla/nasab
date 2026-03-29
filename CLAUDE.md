@@ -225,7 +225,7 @@ Run `/self-update` at any time to trigger a manual review.
 
 | Phase | Goal | Status |
 |-------|------|--------|
-| 0 | Foundation (Supabase, Next.js, i18n, Vercel) | Not started |
+| 0 | Foundation (Supabase, Next.js, i18n, Vercel) | Code complete — pending domain/Supabase/Vercel setup |
 | 1 | Tree MVP (interactive visualisation) | Not started |
 | 2 | Urdu PDF Import (OCR pipeline) | Not started |
 | 3 | User Accounts (auth, dashboard, submission form) | Not started |

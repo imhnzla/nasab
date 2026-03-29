@@ -36,5 +36,11 @@
   "common.error": "An error occurred",
   "common.save": "Save",
   "common.cancel": "Cancel",
-  "common.confirm": "Confirm"
+  "common.confirm": "Confirm",
+  "feature.verified.title": "Verified & Sourced",
+  "feature.verified.desc": "Every lineage is reviewed by specialist scholars with full citations to classical historical sources.",
+  "feature.inclusive.title": "Sunni & Shia",
+  "feature.inclusive.desc": "Both traditions are recognised with equal rigour and a unified methodology — no bias.",
+  "feature.connected.title": "Connecting Descendants",
+  "feature.connected.desc": "Descendants worldwide can submit their lineage for scholarly review and official documentation."
 }

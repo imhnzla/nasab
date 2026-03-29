@@ -36,5 +36,11 @@
   "common.error": "حدث خطأ",
   "common.save": "حفظ",
   "common.cancel": "إلغاء",
-  "common.confirm": "تأكيد"
+  "common.confirm": "تأكيد",
+  "feature.verified.title": "موثَّق ومحقَّق",
+  "feature.verified.desc": "كل نسب يُراجَع من قِبَل علماء متخصصين، مع استشهاد كامل بالمصادر التاريخية الكلاسيكية.",
+  "feature.inclusive.title": "سني وشيعي",
+  "feature.inclusive.desc": "نعترف بكلا التقليدين بمنهجية موحّدة وصرامة علمية متساوية، دون تحيّز.",
+  "feature.connected.title": "ربط الأحفاد",
+  "feature.connected.desc": "يستطيع الأحفاد في كل أنحاء العالم تقديم نسبهم للمراجعة والتوثيق الرسمي."
 }

@@ -2,7 +2,7 @@
 
 **Goal:** Working deployment with empty tree, auth, and base database.
 
-## Status: Not Started
+## Status: In Progress — code complete, pending external setup (domain, Supabase project, Vercel)
 
 ---
 
@@ -32,23 +32,26 @@
 
 ## Checklist
 
-- [ ] Domain registered
-- [ ] Supabase project created (production)
-- [ ] Supabase local dev configured
-- [ ] Vercel project created and linked to GitHub
-- [ ] Next.js 16.2 project scaffolded (TypeScript 6.0, Tailwind v4, shadcn/ui)
-- [ ] next-intl configured (ar default, en secondary)
-- [ ] `app/[locale]/` routing structure in place
-- [ ] `middleware.ts` for i18n + auth session refresh
-- [ ] Initial migrations applied (persons, users, audit_log)
-- [ ] RLS enabled on all tables
-- [ ] Supabase Auth configured (email + Google)
-- [ ] Environment variables set on Vercel
-- [ ] Homepage renders in Arabic and English
-- [ ] Root person seeded (Prophet Muhammad pbuh, generation 1)
+- [ ] Domain registered — **manual**
+- [ ] Supabase project created (production) — **manual**
+- [ ] Supabase local dev configured — **manual**
+- [ ] Vercel project created and linked to GitHub — **manual**
+- [x] Next.js 16.2 project scaffolded (TypeScript 6.0, Tailwind v4, shadcn/ui)
+- [x] next-intl configured (ar default, en secondary)
+- [x] `app/[locale]/` routing structure in place
+- [x] `middleware.ts` for i18n + auth session refresh
+- [x] Initial migrations written (persons, users, audit_log) — apply with `npx supabase db push`
+- [x] RLS enabled on all tables — policies in `20260329000001_rls_policies.sql`
+- [x] Supabase Auth callback route (`/api/auth/callback`) — enable Google OAuth in dashboard manually
+- [ ] Environment variables set on Vercel — **manual: copy `.env.local.example`**
+- [x] Homepage styled and renders in Arabic and English (RTL/LTR, fonts, hero, features)
+- [x] Root person seeded — `supabase/seed.sql` (run via `npx supabase db reset`)
 
 ## Decisions Log
 
 | Date | Decision | Reason |
 |------|----------|--------|
-| | | |
+| 2026-03-29 | Split migrations into `_initial_schema.sql` and `_rls_policies.sql` | Easier to review security policies separately from schema |
+| 2026-03-29 | Load Google Fonts via `next/font` (Amiri, Noto Naskh Arabic, Cormorant Garamond, Inter) | Performance: self-hosted, no layout shift |
+| 2026-03-29 | Auth callback at `/api/auth/callback` | Standard Supabase SSR pattern for PKCE code exchange |
+| 2026-03-29 | Wire all tRPC routers immediately (with TODO stubs) | Type safety for AppRouter available across the app from Phase 0 |

@@ -1,10 +1,18 @@
 'use client'
-// Phase 1 — Root React Flow wrapper with zoom/pan
-// @xyflow/react v12 (renamed from 'reactflow' in v12)
-// Import: import { ReactFlow } from '@xyflow/react'
-// Style:  import '@xyflow/react/dist/style.css'
-// See .claude/agents/tree-visualisation.md for full spec
+// Phase 1 — Root @xyflow/react wrapper with zoom/pan
+// import { ReactFlow } from '@xyflow/react'
+// import '@xyflow/react/dist/style.css'
+// See .claude/agents/tree-visualisation.md for full implementation spec
 
-export function TreeCanvas() {
+import type { PersonFlowNode, FamilyEdge } from '@/lib/tree/types'
+
+export type TreeCanvasProps = {
+  nodes: PersonFlowNode[]
+  edges: FamilyEdge[]
+  onNodeClick?: (personId: string) => void
+}
+
+export function TreeCanvas(_props: TreeCanvasProps): JSX.Element {
+  // TODO: Phase 1 — replace with ReactFlow canvas, load nodes from layout worker
   return <div>TreeCanvas — Phase 1</div>
 }

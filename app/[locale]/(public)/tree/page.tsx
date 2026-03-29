@@ -1,6 +1,38 @@
 // Phase 1 — Interactive Family Tree
-// See docs/build-plan.md#phase-1 and .claude/agents/tree-visualisation.md
+// Public route: /[locale]/tree
+// Server component: fetches verified persons, passes to client wrapper
 
-export default function TreePage() {
-  return <div>Tree — Phase 1</div>
+import React from 'react'
+import type { Metadata } from 'next'
+import { createClient } from '@/lib/supabase/server'
+import type { PersonRow } from '@/lib/tree/types'
+import { TreePageClient } from './TreePageClient'
+
+export const metadata: Metadata = {
+  title: 'Family Tree',
+  description: 'Explore the verified lineage of Prophet Muhammad ﷺ across 8+ generations.',
+  openGraph: {
+    title: 'NASAB Family Tree | شجرة النسب الشريف',
+    description: 'Explore the verified lineage of Prophet Muhammad ﷺ across 8+ generations.',
+    type: 'website',
+  },
+}
+
+export default async function TreePage(): Promise<React.ReactElement> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('persons')
+    .select('*')
+    .eq('is_verified', true)
+    .order('generation', { ascending: true })
+
+  if (error) {
+    // Surface error in UI gracefully — tree will render empty
+    console.error('[TreePage] Failed to fetch persons:', error.message)
+  }
+
+  const persons: PersonRow[] = (data ?? []) as PersonRow[]
+
+  return <TreePageClient persons={persons} />
 }

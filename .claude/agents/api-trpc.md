@@ -19,14 +19,17 @@ You are a specialist in NASAB's type-safe API layer using tRPC and Next.js API r
 server/trpc/
   init.ts            -- initTRPC instance (ONLY place t is created — avoids circular dep)
   routers/
-    persons.ts       -- Tree node CRUD
-    submissions.ts   -- Lineage submission workflow
-    users.ts         -- Profile management
-    admin.ts         -- Admin-only operations
-    search.ts        -- Fuzzy search across persons
-  context.ts         -- Supabase session injection
+    persons.ts       -- list (paginated+filtered), byId, create (Phase 4)
+    submissions.ts   -- Lineage submission workflow (Phase 3)
+    users.ts         -- Profile management (Phase 3)
+    admin.ts         -- Admin-only operations (Phase 4)
+    search.ts        -- fuzzy (calls search_persons RPC via pg_trgm)
+  context.ts         -- Supabase session injection (ctx.supabase available in all procedures)
   middleware.ts      -- Auth + role guards
   root.ts            -- App router combining all routers (imports t from init.ts)
+lib/trpc/
+  client.ts          -- createTRPCReact<AppRouter>() — import { trpc } from '@/lib/trpc/client'
+  provider.tsx       -- TRPCProvider component wrapping QueryClient (add to root layout for Phase 3+)
 ```
 
 **CRITICAL — circular dependency rule:**
@@ -128,3 +131,36 @@ const ratelimit = new Ratelimit({ limiter: Ratelimit.slidingWindow(100, '1m') })
 ```
 
 Return `429 Too Many Requests` with `Retry-After` header when limit exceeded.
+
+## Fuzzy Search — pg_trgm RPC
+
+`search.fuzzy` calls a `SECURITY DEFINER` SQL function, not a raw query, because Supabase JS
+doesn't expose `%` (trigram similarity) or `similarity()` operators directly.
+
+```ts
+// search.ts — key pattern
+const normalised = prepareForSearch(input.q) // strips diacritics, normalises Alef
+const { data } = await ctx.supabase.rpc('search_persons', {
+  query: normalised,
+  branch_filter: input.branch ?? null,
+  result_limit: input.limit,
+})
+```
+
+The `search_persons` function is defined in `supabase/migrations/20260329000003_search_persons_rpc.sql`.
+The pg_trgm extension and GIN indexes are in `20260329000002_phase1_search_indexes.sql`.
+
+## tRPC Client Usage (Phase 1+)
+
+```ts
+// In client components:
+import { trpc } from '@/lib/trpc/client'
+
+const { data, isFetching } = trpc.search.fuzzy.useQuery(
+  { q: preparedQuery, limit: 20 },
+  { enabled: preparedQuery.length >= 1, placeholderData: [] }
+)
+```
+
+The `TRPCProvider` from `lib/trpc/provider.tsx` must wrap the component tree. Add it to
+`app/[locale]/layout.tsx` when wiring up Phase 3 user-facing features.

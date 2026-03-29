@@ -34,16 +34,18 @@ Eight sequential phases. Each phase is fully deployed to production before the n
 
 ### Tasks
 
-- [ ] Install and configure @xyflow/react + D3.js
-- [ ] Build `TreeCanvas` component with zoom/pan
-- [ ] Build `PersonNode` custom node (Arabic/English name, branch colour, generation badge)
-- [ ] Implement D3 hierarchical layout algorithm in a Web Worker
-- [ ] Build `DetailPanel` (slide-in with full biography)
-- [ ] Build `BranchFilter` sidebar
-- [ ] Build `SearchOverlay` with Arabic diacritic-insensitive matching
-- [ ] Add 20–50 historical seed nodes covering first 8 generations
-- [ ] Mobile-responsive layout
-- [ ] Basic SEO (metadata, OpenGraph images for key persons)
+- [x] Install and configure @xyflow/react + D3.js
+- [x] Build `TreeCanvas` component with zoom/pan
+- [x] Build `PersonNode` custom node (Arabic/English name, branch colour, generation badge)
+- [x] Implement hierarchical layout algorithm in a Web Worker (custom tidy-tree, no D3 in worker)
+- [x] Build `DetailPanel` (slide-in with full biography)
+- [x] Build `BranchFilter` sidebar
+- [x] Build `SearchOverlay` with Arabic diacritic-insensitive matching
+- [x] Add 20–50 historical seed nodes covering first 8 generations (30 persons, gen 1–8)
+- [x] Basic SEO (metadata, OpenGraph images for key persons)
+- [ ] Apply migrations to production DB (`npx supabase db push`)
+- [ ] Mobile-responsive layout audit
+- [ ] Tree page live at nasab.org/tree (after DB push + Vercel deploy)
 
 **Deliverable:** Public tree viewable at nasab.org/tree with real data.
 

@@ -36,7 +36,8 @@ app/[locale]/                      # i18n routing (ar default, en secondary)
   layout.tsx                       # Sets <html lang dir>
   page.tsx                         # Homepage
   (public)/
-    tree/page.tsx                  # Interactive family tree (Phase 1)
+    tree/page.tsx                  # Interactive family tree — server component (Phase 1)
+    tree/TreePageClient.tsx        # Client wrapper: layout worker + branch filter + panels (Phase 1)
     search/page.tsx                # Search (Phase 1)
     person/[id]/page.tsx           # Person detail (Phase 1)
     api/page.tsx                   # API docs (Phase 5)
@@ -76,9 +77,14 @@ lib/
   i18n/request.ts                  # next-intl v4 getRequestConfig (server-side locale+messages)
   i18n/config.ts                   # re-exports routing for backwards compat
   i18n/hijri.ts                    # Hijri ↔ Gregorian conversion
-  i18n/arabic.ts                   # normaliseArabic, stripDiacritics, transliterate
+  i18n/arabic.ts                   # normaliseArabic, stripDiacritics, prepareForSearch
+  tree/types.ts                    # Shared types: PersonFlowNode, FamilyEdge, Branch, BRANCH_COLOURS
+  trpc/client.ts                   # createTRPCReact<AppRouter>() browser client
+  trpc/provider.tsx                # TRPCProvider + QueryClientProvider wrapper
   ocr/vision.ts                    # Google Cloud Vision (Phase 2)
   ocr/parser.ts                    # Urdu shajra text parser (Phase 2)
+public/
+  workers/layout.worker.ts         # Web Worker: father_id graph → positioned nodes + edges (Phase 1)
 server/trpc/
   init.ts                          # initTRPC instance (imported by routers to avoid circular deps)
   root.ts                          # App router (imports from init.ts + all routers)
@@ -237,7 +243,7 @@ Run `/self-update` at any time to trigger a manual review.
 | Phase | Goal                                                 | Status                                             |
 | ----- | ---------------------------------------------------- | -------------------------------------------------- |
 | 0     | Foundation (Supabase, Next.js, i18n, Vercel)         | Complete (migrations applied, Vercel project live) |
-| 1     | Tree MVP (interactive visualisation)                 | Not started                                        |
+| 1     | Tree MVP (interactive visualisation)                 | Code complete — apply migrations + seed to finish  |
 | 2     | Urdu PDF Import (OCR pipeline)                       | Not started                                        |
 | 3     | User Accounts (auth, dashboard, submission form)     | Not started                                        |
 | 4     | Verification System (verifier review, approval flow) | Not started                                        |
@@ -245,4 +251,4 @@ Run `/self-update` at any time to trigger a manual review.
 | 6     | Institutional Partnerships                           | Not started                                        |
 | 7     | Scale & Polish (Urdu/Persian, mobile app)            | Not started                                        |
 
-Start with `/scaffold-phase 0`.
+Next: `/scaffold-phase 2` to begin the Urdu PDF digitisation pipeline.

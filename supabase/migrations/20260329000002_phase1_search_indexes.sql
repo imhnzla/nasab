@@ -27,3 +27,14 @@ CREATE INDEX IF NOT EXISTS idx_persons_generation
 -- Composite index for the common list query: branch + generation + verified
 CREATE INDEX IF NOT EXISTS idx_persons_branch_generation_verified
   ON persons (branch, generation, is_verified);
+
+-- ─── Rollback ─────────────────────────────────────────────────────────────────
+-- To reverse this migration:
+--
+-- DROP INDEX IF EXISTS idx_persons_branch_generation_verified;
+-- DROP INDEX IF EXISTS idx_persons_generation;
+-- DROP INDEX IF EXISTS idx_persons_branch;
+-- DROP INDEX IF EXISTS idx_persons_father_id;
+-- DROP INDEX IF EXISTS idx_persons_name_en_trgm;
+-- DROP INDEX IF EXISTS idx_persons_name_ar_trgm;
+-- DROP EXTENSION IF EXISTS pg_trgm;

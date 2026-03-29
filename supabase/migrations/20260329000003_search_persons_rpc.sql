@@ -24,3 +24,8 @@ AS $$
   ORDER BY GREATEST(similarity(name_ar, query), similarity(name_en, query)) DESC
   LIMIT result_limit;
 $$;
+
+-- ─── Rollback ─────────────────────────────────────────────────────────────────
+-- To reverse this migration:
+--
+-- DROP FUNCTION IF EXISTS search_persons(text, text, int);

@@ -78,5 +78,15 @@ export type Database = {
         Update: never
       }
     }
+    Functions: {
+      search_persons: {
+        Args: {
+          query: string
+          branch_filter?: string | null
+          result_limit?: number
+        }
+        Returns: Database['public']['Tables']['persons']['Row'][]
+      }
+    }
   }
 }

@@ -1,4 +1,10 @@
 // Phase 2 — OCR correction UI (side-by-side PDF + extracted names)
-export default function OcrJobPage({ params }: { params: { job_id: string } }) {
-  return <div>OCR Job {params.job_id} — Phase 2</div>
+// Next.js 16: params is a Promise
+export default async function OcrJobPage({
+  params,
+}: {
+  params: Promise<{ job_id: string }>
+}) {
+  const { job_id } = await params
+  return <div>OCR Job {job_id} — Phase 2</div>
 }

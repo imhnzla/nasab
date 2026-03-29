@@ -23,7 +23,7 @@ npx supabase migration new <name>
 
 ## Technology Stack
 
-Next.js 14 (App Router) · TypeScript strict · Tailwind CSS + RTL plugin · shadcn/ui · next-intl · tRPC · Zod · Supabase (PostgreSQL, Auth, Storage) · React Flow + D3.js · Resend · Google Cloud Vision · Vercel
+Next.js 16.2 (App Router, async params) · React 19.2 · TypeScript 6.0 (strict) · Tailwind CSS v4.1 (CSS-first, no tailwind.config.ts) · shadcn/ui · next-intl 4.8 · tRPC 11 · Zod 4.3 · Supabase (PostgreSQL, Auth, Storage) · @xyflow/react 12 + D3.js 7 · Resend 6 · Google Cloud Vision · Vercel
 
 Full rationale: [`docs/tech-stack.md`](docs/tech-stack.md)
 
@@ -70,7 +70,10 @@ lib/
   supabase/client.ts               # Browser client (anon key only)
   supabase/server.ts               # Server client (SSR cookies)
   supabase/types.ts                # Auto-generated — run: npx supabase gen types typescript
-  i18n/config.ts                   # next-intl config
+  i18n/routing.ts                  # next-intl v4 defineRouting (locales, defaultLocale)
+  i18n/navigation.ts               # next-intl v4 createNavigation (Link, redirect, useRouter)
+  i18n/request.ts                  # next-intl v4 getRequestConfig (server-side locale+messages)
+  i18n/config.ts                   # re-exports routing for backwards compat
   i18n/hijri.ts                    # Hijri ↔ Gregorian conversion
   i18n/arabic.ts                   # normaliseArabic, stripDiacritics, transliterate
   ocr/vision.ts                    # Google Cloud Vision (Phase 2)

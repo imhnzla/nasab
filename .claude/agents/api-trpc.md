@@ -46,20 +46,39 @@ export const verifierProcedure = authedProcedure.use(({ ctx, next }) => {
 export const adminProcedure = authedProcedure.use(...)
 ```
 
-## Input Validation (Zod)
+## Input Validation (Zod v4)
+
+**IMPORTANT — Zod v4 breaking changes** (`zod@^4.3.6`):
+
+```ts
+// CORRECT (Zod v4) — uuid/url/email are TOP-LEVEL functions
+z.uuid()          // ✅
+z.url()           // ✅
+z.email()         // ✅
+
+// WRONG (Zod v3) — these no longer exist as string methods
+z.string().uuid() // ❌ TypeError
+z.string().url()  // ❌ TypeError
+z.string().email()// ❌ TypeError
+```
 
 All inputs validated with Zod schemas co-located with their routers:
 ```ts
 const createPersonSchema = z.object({
   name_ar: z.string().min(2).max(200),
   name_en: z.string().min(2).max(200),
-  father_id: z.string().uuid().optional(),
+  father_id: z.uuid().optional(),                          // z.uuid() top-level
   branch: z.enum(['hasanid', 'husaynid', 'hashemite']),
   scholarly_tradition: z.enum(['sunni', 'shia', 'both']),
   generation: z.number().int().min(1).max(100),
-  sources: z.array(z.object({ title: z.string(), url: z.string().url().optional() })),
+  sources: z.array(z.object({
+    title: z.string(),
+    url: z.url().optional(),                               // z.url() top-level
+  })),
 })
 ```
+
+Also note: `error.issues` replaces `error.errors` in Zod v4 (though `errors` is kept as alias).
 
 ## Public REST API (v1)
 

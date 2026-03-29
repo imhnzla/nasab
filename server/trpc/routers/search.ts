@@ -5,14 +5,18 @@ import { t } from '../root'
 
 export const searchRouter = t.router({
   fuzzy: t.procedure
-    .input(z.object({
-      q: z.string().min(1),
-      branch: z.enum(['hasanid', 'husaynid', 'hashemite']).optional(),
-      tradition: z.enum(['sunni', 'shia', 'both']).optional(),
-    }))
-    .query(async ({ ctx, input }) => {
-      // TODO: Phase 1 — use pg_trgm index on name_ar, name_en
-      // Strip Arabic diacritics from input.q before querying
+    .input(
+      z.object({
+        q: z.string().min(1).max(200),
+        branch: z.enum(['hasanid', 'husaynid', 'hashemite']).optional(),
+        tradition: z.enum(['sunni', 'shia', 'both']).optional(),
+        limit: z.number().int().min(1).max(50).default(20),
+      })
+    )
+    .query(async ({ input }) => {
+      // TODO: Phase 1 — use pg_trgm index on name_ar and name_en
+      // Use stripDiacritics(input.q) from lib/i18n/arabic.ts before querying
+      void input
       return []
     }),
 })

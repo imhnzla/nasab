@@ -1,10 +1,10 @@
 import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
 
-const withNextIntl = createNextIntlPlugin('./lib/i18n/config.ts')
+// next-intl v4 — point to the request config file
+const withNextIntl = createNextIntlPlugin('./lib/i18n/request.ts')
 
 const nextConfig: NextConfig = {
-  // Image optimisation — add Supabase storage domain once project is created
   images: {
     remotePatterns: [
       {
@@ -15,7 +15,6 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Security headers
   async headers() {
     return [
       {

@@ -192,6 +192,7 @@ Specialised agents in `.claude/agents/` — invoke them for focused work:
 | `/check-rls` | Audit all tables for RLS coverage |
 | `/digitise-shajra <path>` | Start OCR pipeline for an Urdu PDF |
 | `/self-update` | Review session learnings and update all config/docs files |
+| `/consistency-check` | Audit codebase, docs, and .claude/ for internal inconsistencies |
 
 ## Hooks (Automated)
 

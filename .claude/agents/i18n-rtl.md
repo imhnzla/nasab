@@ -23,7 +23,10 @@ messages/
   ar.json        # Arabic translations (canonical)
   en.json        # English translations
 lib/i18n/
-  config.ts      # next-intl configuration
+  routing.ts     # next-intl v4 defineRouting (locales, defaultLocale, localePrefix)
+  navigation.ts  # next-intl v4 createNavigation exports (Link, redirect, useRouter, usePathname)
+  request.ts     # next-intl v4 getRequestConfig + hasLocale (server-side locale resolution)
+  config.ts      # re-exports routing for backwards compat only — do not add new code here
   hijri.ts       # Hijri ↔ Gregorian conversion utilities
   arabic.ts      # Arabic text helpers (normalise, strip diacritics, transliterate)
 ```

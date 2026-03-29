@@ -11,7 +11,7 @@ Eight sequential phases. Each phase is fully deployed to production before the n
 - [ ] Register domain (nasab.org or nasab.app)
 - [ ] Create Supabase project (production + local dev)
 - [ ] Create Vercel project and connect GitHub repo
-- [ ] Scaffold Next.js 14 project with TypeScript, Tailwind CSS, shadcn/ui
+- [ ] Scaffold Next.js 16 project with TypeScript, Tailwind CSS v4, shadcn/ui
 - [ ] Configure next-intl for Arabic (default) and English
 - [ ] Set up `app/[locale]/` routing structure
 - [ ] Write and apply initial database migrations (persons, users, audit_log)

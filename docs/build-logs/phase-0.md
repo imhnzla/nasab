@@ -31,6 +31,15 @@
 
 ---
 
+### 2026-03-29 — Vercel deployment fixes
+
+- Fixed CSS `@import` order in `globals.css` — Google Fonts `@import url()` must precede `@import 'tailwindcss'` (CSS spec, was triggering build warning)
+- Renamed `middleware.ts` → `proxy.ts`, exported function renamed `middleware()` → `proxy()` — Next.js 16.2 deprecated the `middleware` file convention in favour of `proxy`
+- Added `npm overrides` in `package.json` to resolve TypeScript 6 peer dep conflicts on Vercel — 8 packages capped at `typescript@<6.0.0` were blocking `npm install`: `@typescript-eslint/parser`, `@typescript-eslint/eslint-plugin`, `@typescript-eslint/utils`, `@typescript-eslint/typescript-estree`, `@typescript-eslint/type-utils`, `typescript-eslint`, `next-intl`, `ts-jest`. All now accept TS 6 via `"$typescript"` override reference.
+- Pinned `engines.node` to `"22.x"` (was `">=20.9.0"`) — eliminates Vercel "will auto-upgrade" warning; matches `@types/node@^22` in devDependencies
+
+---
+
 ## Checklist
 
 - [ ] Domain registered — **manual**
@@ -40,7 +49,7 @@
 - [x] Next.js 16.2 project scaffolded (TypeScript 6.0, Tailwind v4, shadcn/ui)
 - [x] next-intl configured (ar default, en secondary)
 - [x] `app/[locale]/` routing structure in place
-- [x] `middleware.ts` for i18n + auth session refresh
+- [x] `proxy.ts` for i18n + auth session refresh (renamed from middleware.ts — Next.js 16.2)
 - [x] Initial migrations written (persons, users, audit_log) — apply with `npx supabase db push`
 - [x] RLS enabled on all tables — policies in `20260329000001_rls_policies.sql`
 - [x] Supabase Auth callback route (`/api/auth/callback`) — enable Google OAuth in dashboard manually
@@ -50,13 +59,16 @@
 
 ## Decisions Log
 
-| Date       | Decision                                                                                 | Reason                                                                                                                                    |
-| ---------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-03-29 | Split migrations into `_initial_schema.sql` and `_rls_policies.sql`                      | Easier to review security policies separately from schema                                                                                 |
-| 2026-03-29 | Load Google Fonts via CSS `@import url()` in `globals.css` instead of `next/font/google` | `next/font/google` fetches at build time; sandboxed/offline builds fail — CSS @import loads at browser runtime                            |
-| 2026-03-29 | Auth callback at `/api/auth/callback`                                                    | Standard Supabase SSR pattern for PKCE code exchange                                                                                      |
-| 2026-03-29 | Wire all tRPC routers immediately (with TODO stubs)                                      | Type safety for AppRouter available across the app from Phase 0                                                                           |
-| 2026-03-29 | Extract `server/trpc/init.ts` to hold `initTRPC` instance                                | `root.ts` importing routers that imported `t` from `root.ts` caused circular dep build error (`Cannot access 'ck' before initialization`) |
-| 2026-03-29 | Native ESLint 9 flat config (no `FlatCompat`)                                            | `@eslint/eslintrc` FlatCompat throws circular JSON serialisation error with `eslint-config-next` in ESLint 9                              |
-| 2026-03-29 | Applied both migrations via Supabase Management REST API                                 | Supabase CLI `db push` failed — no TCP/DNS access to pooler from sandbox; REST API (`/v1/projects/{ref}/database/query`) worked           |
-| 2026-03-29 | Created Vercel project + set env vars via Vercel REST API                                | Vercel CLI had no DNS access in sandbox; REST API (`api.vercel.com`) worked                                                               |
+| Date       | Decision                                                                                           | Reason                                                                                                                                    |
+| ---------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-03-29 | Split migrations into `_initial_schema.sql` and `_rls_policies.sql`                                | Easier to review security policies separately from schema                                                                                 |
+| 2026-03-29 | Load Google Fonts via CSS `@import url()` in `globals.css` instead of `next/font/google`           | `next/font/google` fetches at build time; sandboxed/offline builds fail — CSS @import loads at browser runtime                            |
+| 2026-03-29 | Auth callback at `/api/auth/callback`                                                              | Standard Supabase SSR pattern for PKCE code exchange                                                                                      |
+| 2026-03-29 | Wire all tRPC routers immediately (with TODO stubs)                                                | Type safety for AppRouter available across the app from Phase 0                                                                           |
+| 2026-03-29 | Extract `server/trpc/init.ts` to hold `initTRPC` instance                                          | `root.ts` importing routers that imported `t` from `root.ts` caused circular dep build error (`Cannot access 'ck' before initialization`) |
+| 2026-03-29 | Native ESLint 9 flat config (no `FlatCompat`)                                                      | `@eslint/eslintrc` FlatCompat throws circular JSON serialisation error with `eslint-config-next` in ESLint 9                              |
+| 2026-03-29 | Applied both migrations via Supabase Management REST API                                           | Supabase CLI `db push` failed — no TCP/DNS access to pooler from sandbox; REST API (`/v1/projects/{ref}/database/query`) worked           |
+| 2026-03-29 | Created Vercel project + set env vars via Vercel REST API                                          | Vercel CLI had no DNS access in sandbox; REST API (`api.vercel.com`) worked                                                               |
+| 2026-03-29 | Renamed root `middleware.ts` → `proxy.ts`, export `middleware()` → `proxy()`                       | Next.js 16.2 deprecated the `middleware` file convention; `proxy` is the new name                                                         |
+| 2026-03-29 | npm `overrides` with `"$typescript"` for 8 `@typescript-eslint/*`, `next-intl`, `ts-jest` packages | None of these support `typescript@>=6.0.0` yet; overrides tell npm to accept the root TS version                                          |
+| 2026-03-29 | Pinned `engines.node` to `"22.x"`                                                                  | `">=20.9.0"` triggers Vercel auto-upgrade warning; `22.x` matches `@types/node@^22` already in devDeps                                    |

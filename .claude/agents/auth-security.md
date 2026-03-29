@@ -20,21 +20,32 @@ You are a specialist in authentication and security for NASAB using Supabase Aut
 ```ts
 // lib/supabase/client.ts  — browser
 import { createBrowserClient } from '@supabase/ssr'
-export const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+export function createClient(): BrowserClient {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
 
 // lib/supabase/server.ts  — server components / API routes
-import { createServerClient } from '@supabase/ssr'
-// uses cookies() from next/headers
+// IMPORTANT: createClient() is async in Next.js 16 — always await it
+export async function createClient(): Promise<ServerClient> {
+  const cookieStore = await cookies()  // cookies() returns Promise in Next.js 16
+  return createServerClient(url, key, { cookies: { getAll: () => cookieStore.getAll(), ... } })
+}
+
+// Caller pattern:
+const supabase = await createClient()
 ```
+
+**Next.js 16 gotcha:** `cookies()` from `next/headers` returns `Promise<ReadonlyRequestCookies>` — always `await` it. Calling `.getAll()` on the Promise directly causes a runtime error.
 
 Never use `service_role` key outside of server-only code (API routes, server actions). Never expose it to the client bundle.
 
 ## Middleware (Route Protection)
 
 `middleware.ts` at project root handles:
+
 1. i18n locale detection and redirect
 2. Session refresh on every request
 3. Redirect unauthenticated users away from `/dashboard`, `/submit`, `/admin`

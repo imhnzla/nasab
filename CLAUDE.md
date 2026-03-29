@@ -181,7 +181,7 @@ Specialised agents in `.claude/agents/` — invoke them for focused work:
 | Agent                   | Use When                                                    |
 | ----------------------- | ----------------------------------------------------------- |
 | `db-supabase`           | Migrations, RLS policies, schema changes, seed data         |
-| `tree-visualisation`    | React Flow nodes, D3 layout, tree canvas, PNG export        |
+| `tree-visualisation`    | @xyflow/react nodes, D3 layout, tree canvas, PNG export     |
 | `i18n-rtl`              | Translations, RTL layout, Hijri dates, Arabic text          |
 | `verification-workflow` | Submission pipeline, verifier UI, status transitions        |
 | `auth-security`         | Supabase Auth, RLS, role guards, middleware                 |
@@ -234,15 +234,15 @@ Run `/self-update` at any time to trigger a manual review.
 
 ## Build Phases
 
-| Phase | Goal                                                 | Status                                               |
-| ----- | ---------------------------------------------------- | ---------------------------------------------------- |
-| 0     | Foundation (Supabase, Next.js, i18n, Vercel)         | Code complete — pending domain/Supabase/Vercel setup |
-| 1     | Tree MVP (interactive visualisation)                 | Not started                                          |
-| 2     | Urdu PDF Import (OCR pipeline)                       | Not started                                          |
-| 3     | User Accounts (auth, dashboard, submission form)     | Not started                                          |
-| 4     | Verification System (verifier review, approval flow) | Not started                                          |
-| 5     | Public API (REST v1, rate limiting, docs)            | Not started                                          |
-| 6     | Institutional Partnerships                           | Not started                                          |
-| 7     | Scale & Polish (Urdu/Persian, mobile app)            | Not started                                          |
+| Phase | Goal                                                 | Status                                             |
+| ----- | ---------------------------------------------------- | -------------------------------------------------- |
+| 0     | Foundation (Supabase, Next.js, i18n, Vercel)         | Complete (migrations applied, Vercel project live) |
+| 1     | Tree MVP (interactive visualisation)                 | Not started                                        |
+| 2     | Urdu PDF Import (OCR pipeline)                       | Not started                                        |
+| 3     | User Accounts (auth, dashboard, submission form)     | Not started                                        |
+| 4     | Verification System (verifier review, approval flow) | Not started                                        |
+| 5     | Public API (REST v1, rate limiting, docs)            | Not started                                        |
+| 6     | Institutional Partnerships                           | Not started                                        |
+| 7     | Scale & Polish (Urdu/Persian, mobile app)            | Not started                                        |
 
 Start with `/scaffold-phase 0`.

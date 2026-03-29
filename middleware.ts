@@ -8,9 +8,8 @@ import { routing } from '@/lib/i18n/routing'
 const intlMiddleware = createMiddleware(routing)
 
 const PROTECTED_PATHS = ['/dashboard', '/submit', '/profile']
-const ADMIN_PATHS = ['/admin']
 
-export async function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest): Promise<NextResponse> {
   // 1. Handle i18n routing
   const response = intlMiddleware(request)
 
@@ -22,9 +21,7 @@ export async function middleware(request: NextRequest) {
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (cs) =>
-          cs.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          ),
+          cs.forEach(({ name, value, options }) => response.cookies.set(name, value, options)),
       },
     }
   )

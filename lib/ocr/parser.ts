@@ -9,7 +9,7 @@ export interface DraftPerson {
 }
 
 /** Parse raw OCR text from a shajra page into draft person records */
-export function parseShajraText(rawText: string): DraftPerson[] {
+export function parseShajraText(_rawText: string): DraftPerson[] {
   // TODO: Phase 2 — implement ibn/bin/bint pattern matching + indentation depth
   return []
 }

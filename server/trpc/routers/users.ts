@@ -3,7 +3,7 @@
 // Zod v4: z.uuid() is now top-level
 import { z } from 'zod'
 import { authedProcedure, adminProcedure } from '../middleware'
-import { t } from '../root'
+import { t } from '../init'
 
 export const usersRouter = t.router({
   me: authedProcedure.query(async () => {

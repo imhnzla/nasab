@@ -17,6 +17,7 @@ You are a specialist in NASAB's type-safe API layer using tRPC and Next.js API r
 
 ```
 server/trpc/
+  init.ts            -- initTRPC instance (ONLY place t is created — avoids circular dep)
   routers/
     persons.ts       -- Tree node CRUD
     submissions.ts   -- Lineage submission workflow
@@ -25,8 +26,14 @@ server/trpc/
     search.ts        -- Fuzzy search across persons
   context.ts         -- Supabase session injection
   middleware.ts      -- Auth + role guards
-  root.ts            -- App router combining all routers
+  root.ts            -- App router combining all routers (imports t from init.ts)
 ```
+
+**CRITICAL — circular dependency rule:**
+
+- `t` is defined in `init.ts` only. Import it from `'../init'` in routers and middleware.
+- **Never** import `t` from `root.ts` — `root.ts` imports the routers, so importing back into it creates a circular reference that causes a build error (`Cannot access 'ck' before initialization`).
+- When adding a new router: create `server/trpc/routers/newRouter.ts`, import `t` from `'../init'`, then add it to `root.ts`.
 
 ## Middleware Guards
 
@@ -52,29 +59,32 @@ export const adminProcedure = authedProcedure.use(...)
 
 ```ts
 // CORRECT (Zod v4) — uuid/url/email are TOP-LEVEL functions
-z.uuid()          // ✅
-z.url()           // ✅
-z.email()         // ✅
+z.uuid() // ✅
+z.url() // ✅
+z.email() // ✅
 
 // WRONG (Zod v3) — these no longer exist as string methods
 z.string().uuid() // ❌ TypeError
-z.string().url()  // ❌ TypeError
-z.string().email()// ❌ TypeError
+z.string().url() // ❌ TypeError
+z.string().email() // ❌ TypeError
 ```
 
 All inputs validated with Zod schemas co-located with their routers:
+
 ```ts
 const createPersonSchema = z.object({
   name_ar: z.string().min(2).max(200),
   name_en: z.string().min(2).max(200),
-  father_id: z.uuid().optional(),                          // z.uuid() top-level
+  father_id: z.uuid().optional(), // z.uuid() top-level
   branch: z.enum(['hasanid', 'husaynid', 'hashemite']),
   scholarly_tradition: z.enum(['sunni', 'shia', 'both']),
   generation: z.number().int().min(1).max(100),
-  sources: z.array(z.object({
-    title: z.string(),
-    url: z.url().optional(),                               // z.url() top-level
-  })),
+  sources: z.array(
+    z.object({
+      title: z.string(),
+      url: z.url().optional(), // z.url() top-level
+    })
+  ),
 })
 ```
 
@@ -85,15 +95,15 @@ Also note: `error.issues` replaces `error.errors` in Zod v4 (though `errors` is 
 Base URL: `/api/v1`
 Rate limit: **100 requests/minute per IP** (via `@upstash/ratelimit` + Vercel Edge Config)
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| GET | `/persons` | None | Paginated list |
-| GET | `/persons/[id]` | None | Single person + ancestry path |
-| GET | `/persons/[id]/descendants` | None | Subtree |
-| GET | `/search?q=` | None | Fuzzy search |
-| GET | `/branches` | None | Branch summary stats |
-| POST | `/submissions` | Bearer | Submit lineage claim |
-| GET | `/submissions/[id]` | Bearer | Own submission status |
+| Method | Path                        | Auth   | Description                   |
+| ------ | --------------------------- | ------ | ----------------------------- |
+| GET    | `/persons`                  | None   | Paginated list                |
+| GET    | `/persons/[id]`             | None   | Single person + ancestry path |
+| GET    | `/persons/[id]/descendants` | None   | Subtree                       |
+| GET    | `/search?q=`                | None   | Fuzzy search                  |
+| GET    | `/branches`                 | None   | Branch summary stats          |
+| POST   | `/submissions`              | Bearer | Submit lineage claim          |
+| GET    | `/submissions/[id]`         | Bearer | Own submission status         |
 
 ## Response Envelope
 

@@ -1,41 +1,44 @@
+/* Google Fonts — must precede all other @import rules */
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+
 /* Tailwind CSS v4 — CSS-first configuration.
    No tailwind.config.ts needed. All design tokens defined here via @theme. */
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ── Design Tokens ────────────────────────────────────────────── */
 @theme {
   /* Brand colours — available as bg-nasab-navy, text-nasab-gold, etc. */
-  --color-nasab-navy:  #0D1B2A;
-  --color-nasab-gold:  #C9A84C;
-  --color-nasab-cream: #F5ECD7;
-  --color-nasab-green: #1B5E20;
+  --color-nasab-navy: #0d1b2a;
+  --color-nasab-gold: #c9a84c;
+  --color-nasab-cream: #f5ecd7;
+  --color-nasab-green: #1b5e20;
 
   /* Branch colours */
-  --color-hasanid:   #1B5E20;
-  --color-husaynid:  #0D1B2A;
-  --color-hashemite: #C9A84C;
+  --color-hasanid: #1b5e20;
+  --color-husaynid: #0d1b2a;
+  --color-hashemite: #c9a84c;
 
   /* shadcn/ui CSS variable tokens */
-  --color-background:         var(--nasab-cream, #F5ECD7);
-  --color-foreground:         var(--nasab-navy,  #0D1B2A);
-  --color-primary:            var(--nasab-gold,  #C9A84C);
-  --color-primary-foreground: var(--nasab-navy,  #0D1B2A);
-  --color-secondary:          var(--nasab-green, #1B5E20);
-  --color-secondary-foreground: #F5ECD7;
-  --color-muted:              oklch(93% 0.02 90);
-  --color-muted-foreground:   oklch(40% 0.04 250);
-  --color-border:             oklch(85% 0.03 90);
-  --color-ring:               var(--nasab-gold, #C9A84C);
+  --color-background: var(--nasab-cream, #f5ecd7);
+  --color-foreground: var(--nasab-navy, #0d1b2a);
+  --color-primary: var(--nasab-gold, #c9a84c);
+  --color-primary-foreground: var(--nasab-navy, #0d1b2a);
+  --color-secondary: var(--nasab-green, #1b5e20);
+  --color-secondary-foreground: #f5ecd7;
+  --color-muted: oklch(93% 0.02 90);
+  --color-muted-foreground: oklch(40% 0.04 250);
+  --color-border: oklch(85% 0.03 90);
+  --color-ring: var(--nasab-gold, #c9a84c);
 
   /* Typography */
   --font-arabic-display: 'Amiri', 'Scheherazade New', serif;
-  --font-arabic-body:    'Noto Naskh Arabic', serif;
-  --font-en-display:     'Cormorant Garamond', serif;
-  --font-en-body:        'Inter', sans-serif;
+  --font-arabic-body: 'Noto Naskh Arabic', serif;
+  --font-en-display: 'Cormorant Garamond', serif;
+  --font-en-body: 'Inter', sans-serif;
 
   /* Border radius */
   --radius-sm: 0.25rem;
-  --radius:    0.5rem;
+  --radius: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
 }
@@ -48,12 +51,12 @@
   }
 
   /* Arabic body font in RTL context */
-  [dir="rtl"] body {
+  [dir='rtl'] body {
     font-family: var(--font-arabic-body);
   }
 
   /* English body font in LTR context */
-  [dir="ltr"] body {
+  [dir='ltr'] body {
     font-family: var(--font-en-body);
   }
 

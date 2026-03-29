@@ -1,7 +1,7 @@
 // tRPC router — fuzzy search across persons
 // Phase 1
 import { z } from 'zod'
-import { t } from '../root'
+import { t } from '../init'
 
 export const searchRouter = t.router({
   fuzzy: t.procedure

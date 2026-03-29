@@ -2,7 +2,7 @@
 // Phase 1 (read) + Phase 4 (write)
 // Zod v4: z.uuid() / z.url() are now top-level (z.string().uuid() deprecated)
 import { z } from 'zod'
-import { t } from '../root'
+import { t } from '../init'
 import { adminProcedure } from '../middleware'
 
 export const personsRouter = t.router({

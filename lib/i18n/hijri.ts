@@ -2,7 +2,11 @@
 // Arabic-Indic numerals used for Hijri display in Arabic locale
 
 /** Format a dual-date string showing both Hijri and Gregorian */
-export function formatDualDate(hijri: string | null, gregorian: Date | null, locale: 'ar' | 'en'): string {
+export function formatDualDate(
+  hijri: string | null,
+  _gregorian: Date | null,
+  _locale: 'ar' | 'en'
+): string {
   // TODO: Phase 0 — implement using Intl.DateTimeFormat with calendar: 'islamic'
   return hijri ?? ''
 }

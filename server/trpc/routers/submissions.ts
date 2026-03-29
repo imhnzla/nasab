@@ -2,7 +2,7 @@
 // Phase 3 (create/read own) + Phase 4 (verifier actions)
 // Zod v4: z.uuid() is now top-level
 import { z } from 'zod'
-import { t } from '../root'
+import { t } from '../init'
 import { authedProcedure, verifierProcedure } from '../middleware'
 
 export const submissionsRouter = t.router({

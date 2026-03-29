@@ -5,32 +5,36 @@ Eight sequential phases. Each phase is fully deployed to production before the n
 ---
 
 ## Phase 0 — Foundation
+
 **Goal:** Working deployment with empty tree.
 
 ### Tasks
-- [ ] Register domain (nasab.org or nasab.app)
-- [ ] Create Supabase project (production + local dev)
-- [ ] Create Vercel project and connect GitHub repo
-- [ ] Scaffold Next.js 16 project with TypeScript, Tailwind CSS v4, shadcn/ui
-- [ ] Configure next-intl for Arabic (default) and English
-- [ ] Set up `app/[locale]/` routing structure
-- [ ] Write and apply initial database migrations (persons, users, audit_log)
-- [ ] Enable RLS on all tables with base policies
-- [ ] Configure Supabase Auth (email + Google)
-- [ ] Set up `middleware.ts` for i18n + auth session refresh
-- [ ] Configure environment variables on Vercel
-- [ ] Deploy and verify blank homepage renders in Arabic and English
-- [ ] Seed database with Prophet Muhammad (pbuh) as root node
+
+- [ ] Register domain (nasab.org or nasab.app) — **manual: buy domain**
+- [ ] Create Supabase project (production + local dev) — **manual: supabase.com**
+- [ ] Create Vercel project and connect GitHub repo — **manual: vercel.com**
+- [x] Scaffold Next.js 16 project with TypeScript, Tailwind CSS v4, shadcn/ui
+- [x] Configure next-intl for Arabic (default) and English
+- [x] Set up `app/[locale]/` routing structure
+- [x] Write and apply initial database migrations (persons, users, audit_log)
+- [x] Enable RLS on all tables with base policies
+- [x] Configure Supabase Auth (email + Google) — callback route added; OAuth providers enabled in Supabase dashboard (manual)
+- [x] Set up `middleware.ts` for i18n + auth session refresh
+- [ ] Configure environment variables on Vercel — **manual: copy from `.env.local.example`**
+- [ ] Deploy and verify blank homepage renders in Arabic and English — **manual: after Vercel deploy**
+- [x] Seed database with Prophet Muhammad (pbuh) as root node — `supabase/seed.sql` ready
 
 **Deliverable:** Live URL showing a blank bilingual homepage.
 
 ---
 
 ## Phase 1 — Tree MVP
+
 **Goal:** Interactive tree visible to the public.
 
 ### Tasks
-- [ ] Install and configure React Flow + D3.js
+
+- [ ] Install and configure @xyflow/react + D3.js
 - [ ] Build `TreeCanvas` component with zoom/pan
 - [ ] Build `PersonNode` custom node (Arabic/English name, branch colour, generation badge)
 - [ ] Implement D3 hierarchical layout algorithm in a Web Worker
@@ -46,9 +50,11 @@ Eight sequential phases. Each phase is fully deployed to production before the n
 ---
 
 ## Phase 2 — Urdu PDF Digitisation
+
 **Goal:** Import handwritten shajra documents into the tree.
 
 ### Tasks
+
 - [ ] Set up Google Cloud Vision API credentials
 - [ ] Build PDF → image pipeline (server-side, poppler)
 - [ ] Build OCR extraction service (`lib/ocr/vision.ts`)
@@ -63,9 +69,11 @@ Eight sequential phases. Each phase is fully deployed to production before the n
 ---
 
 ## Phase 3 — User Accounts
+
 **Goal:** Users can register and manage profiles.
 
 ### Tasks
+
 - [ ] Build registration and login pages (email + Google)
 - [ ] Build user dashboard (`/dashboard`)
 - [ ] Build profile settings page
@@ -79,9 +87,11 @@ Eight sequential phases. Each phase is fully deployed to production before the n
 ---
 
 ## Phase 4 — Verification System
+
 **Goal:** Verifiers can review and approve submissions.
 
 ### Tasks
+
 - [ ] Build verifier dashboard (`/admin/submissions`)
 - [ ] Build submission detail + PDF review panel
 - [ ] Implement status transition logic (pending → under_review → approved/rejected)
@@ -96,9 +106,11 @@ Eight sequential phases. Each phase is fully deployed to production before the n
 ---
 
 ## Phase 5 — Public API
+
 **Goal:** External developers can query the tree.
 
 ### Tasks
+
 - [ ] Build `/api/v1/` REST endpoints (persons, search, branches, tree)
 - [ ] Implement Upstash rate limiting (100 req/min per IP)
 - [ ] Write OpenAPI spec
@@ -110,9 +122,11 @@ Eight sequential phases. Each phase is fully deployed to production before the n
 ---
 
 ## Phase 6 — Institutional Partnerships
+
 **Goal:** Verified organisations can contribute data.
 
 ### Tasks
+
 - [ ] Institutional account type with verified badge
 - [ ] Bulk import API for partner databases
 - [ ] White-label tree embed (`<iframe>` + JS widget)
@@ -123,9 +137,11 @@ Eight sequential phases. Each phase is fully deployed to production before the n
 ---
 
 ## Phase 7 — Scale & Polish
+
 **Goal:** Production-hardened, full-featured platform.
 
 ### Tasks
+
 - [ ] Urdu language support
 - [ ] Persian language support
 - [ ] Academic citation export (BibTeX, Chicago)

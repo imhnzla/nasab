@@ -1,24 +1,33 @@
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
-import { FlatCompat } from '@eslint/eslintrc'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
-const compat = new FlatCompat({ baseDirectory: __dirname })
+// ESLint 9 native flat config — no FlatCompat needed
+import tsPlugin from '@typescript-eslint/eslint-plugin'
+import tsParser from '@typescript-eslint/parser'
 
 const config = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
+    ignores: ['.next/**', 'node_modules/**', 'exports/**'],
+  },
+  // Base rules for all TS/TSX
+  {
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: { project: './tsconfig.json' },
+    },
+    plugins: { '@typescript-eslint': tsPlugin },
     rules: {
-      // No implicit any — matches tsconfig strict: true
+      ...tsPlugin.configs.recommended.rules,
       '@typescript-eslint/no-explicit-any': 'error',
-      // Require explicit return types on exported functions
-      '@typescript-eslint/explicit-module-boundary-types': 'warn',
-      // Catch unused variables early
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      // Prevent accidental console.log left in
       'no-console': ['warn', { allow: ['warn', 'error'] }],
+      // Off for .tsx — Next.js page/component return types are inferred
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+    },
+  },
+  // Enforce explicit return types on library/server code (.ts only)
+  {
+    files: ['lib/**/*.ts', 'server/**/*.ts', 'middleware.ts'],
+    rules: {
+      '@typescript-eslint/explicit-module-boundary-types': 'error',
     },
   },
 ]

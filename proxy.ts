@@ -1,4 +1,4 @@
-// Next.js middleware — i18n locale routing + Supabase session refresh
+// Next.js proxy (formerly middleware) — i18n locale routing + Supabase session refresh
 // next-intl v4: createMiddleware is imported from 'next-intl/middleware'
 import createMiddleware from 'next-intl/middleware'
 import { createServerClient } from '@supabase/ssr'
@@ -8,9 +8,8 @@ import { routing } from '@/lib/i18n/routing'
 const intlMiddleware = createMiddleware(routing)
 
 const PROTECTED_PATHS = ['/dashboard', '/submit', '/profile']
-const ADMIN_PATHS = ['/admin']
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest): Promise<NextResponse> {
   // 1. Handle i18n routing
   const response = intlMiddleware(request)
 
@@ -22,9 +21,7 @@ export async function middleware(request: NextRequest) {
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (cs) =>
-          cs.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          ),
+          cs.forEach(({ name, value, options }) => response.cookies.set(name, value, options)),
       },
     }
   )

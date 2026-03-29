@@ -58,3 +58,4 @@ exports/*.png
 .vscode/settings.json
 *.swp
 *.swo
+.claude/settings.local.json

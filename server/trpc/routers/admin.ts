@@ -2,7 +2,7 @@
 // Phase 4
 import { z } from 'zod'
 import { adminProcedure } from '../middleware'
-import { t } from '../root'
+import { t } from '../init'
 
 export const adminRouter = t.router({
   allSubmissions: adminProcedure

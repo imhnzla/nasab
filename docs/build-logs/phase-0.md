@@ -29,6 +29,13 @@
 - Created all tRPC router stubs with Zod v4 schema patterns
 - Created lib/utils.ts (cn() helper for shadcn/ui)
 
+### 2026-03-29 — Vercel deployment fixes
+
+- Fixed CSS `@import` order in `globals.css` — Google Fonts `@import url()` must precede `@import 'tailwindcss'` (CSS spec, was triggering build warning)
+- Renamed `middleware.ts` → `proxy.ts`, exported function renamed `middleware()` → `proxy()` — Next.js 16.2 deprecated the `middleware` file convention in favour of `proxy`
+- Added `npm overrides` in `package.json` to resolve TypeScript 6 peer dep conflicts on Vercel — 8 packages capped at `typescript@<6.0.0` were blocking `npm install`: `@typescript-eslint/parser`, `@typescript-eslint/eslint-plugin`, `@typescript-eslint/utils`, `@typescript-eslint/typescript-estree`, `@typescript-eslint/type-utils`, `typescript-eslint`, `next-intl`, `ts-jest`. All now accept TS 6 via `"$typescript"` override reference.
+- Pinned `engines.node` to `"22.x"` (was `">=20.9.0"`) — eliminates Vercel "will auto-upgrade" warning; matches `@types/node@^22` in devDependencies
+
 ---
 
 ### 2026-03-29 — Vercel deployment fixes

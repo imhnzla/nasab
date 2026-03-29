@@ -42,20 +42,24 @@ const supabase = await createClient()
 
 Never use `service_role` key outside of server-only code (API routes, server actions). Never expose it to the client bundle.
 
-## Middleware (Route Protection)
+## Proxy / Route Protection
 
-`middleware.ts` at project root handles:
+`proxy.ts` at project root handles:
 
 1. i18n locale detection and redirect
 2. Session refresh on every request
 3. Redirect unauthenticated users away from `/dashboard`, `/submit`, `/admin`
 4. Redirect non-admin users away from `/admin`
 
+**Next.js 16.2 naming:** The file is `proxy.ts` (not `middleware.ts`) and the exported function must be named `proxy` (not `middleware`). The `config` export with `matcher` is unchanged.
+
 ```ts
-// Protected route patterns
-const PROTECTED = ['/dashboard', '/submit', '/profile']
-const ADMIN_ONLY = ['/admin']
-const VERIFIER_PLUS = ['/review']
+// proxy.ts — correct Next.js 16.2 pattern
+export async function proxy(request: NextRequest): Promise<NextResponse> { ... }
+export const config = { matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'] }
+
+// Protected route patterns (strip locale prefix first)
+const PROTECTED_PATHS = ['/dashboard', '/submit', '/profile']
 ```
 
 ## RLS Policy Patterns

@@ -1,9 +1,9 @@
+/* Google Fonts — must precede all other @import rules */
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+
 /* Tailwind CSS v4 — CSS-first configuration.
    No tailwind.config.ts needed. All design tokens defined here via @theme. */
 @import 'tailwindcss';
-
-/* ── Google Fonts ─────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
 
 /* ── Design Tokens ────────────────────────────────────────────── */
 @theme {

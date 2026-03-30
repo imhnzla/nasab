@@ -4,6 +4,7 @@ import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '@/lib/i18n/routing'
 import type { Locale } from '@/lib/i18n/routing'
+import { TRPCProvider } from '@/lib/trpc/provider'
 import '@/app/globals.css'
 
 export const metadata: Metadata = {
@@ -37,7 +38,9 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={dir}>
       <body className="bg-nasab-cream text-nasab-navy min-h-screen antialiased">
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+        <TRPCProvider>
+          <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+        </TRPCProvider>
       </body>
     </html>
   )

@@ -6,8 +6,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useReactFlow, ReactFlowProvider } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
-import type { PersonRow, Branch, PersonFlowNode, FamilyEdge } from '@/lib/tree/types'
-import type { LayoutNode, LayoutWorkerOutput } from '@/public/workers/layout.worker'
+import type { PersonRow, Branch, PersonFlowNode, FamilyEdge, SearchHit } from '@/lib/tree/types'
+import type { LayoutNode, LayoutWorkerOutput } from '@/lib/workers/layout.worker'
 import { TreeCanvas } from '@/components/tree/TreeCanvas'
 import { BranchFilter } from '@/components/tree/BranchFilter'
 import { DetailPanel } from '@/components/tree/DetailPanel'
@@ -29,7 +29,7 @@ function layoutNodesToFlowNodes(layoutNodes: LayoutNode[]): PersonFlowNode[] {
   }))
 }
 
-function TreePageClientInner({ persons }: TreePageClientInnerProps): JSX.Element {
+function TreePageClientInner({ persons }: TreePageClientInnerProps): React.ReactElement {
   const { setCenter } = useReactFlow()
 
   const [nodes, setNodes] = useState<PersonFlowNode[]>([])
@@ -49,7 +49,7 @@ function TreePageClientInner({ persons }: TreePageClientInnerProps): JSX.Element
 
     // Create or reuse worker
     if (!workerRef.current) {
-      workerRef.current = new Worker(new URL('/workers/layout.worker.ts', import.meta.url), {
+      workerRef.current = new Worker(new URL('@/lib/workers/layout.worker.ts', import.meta.url), {
         type: 'module',
       })
     }
@@ -99,17 +99,20 @@ function TreePageClientInner({ persons }: TreePageClientInnerProps): JSX.Element
   )
 
   const handleSearchSelect = useCallback(
-    (person: PersonRow) => {
+    (hit: SearchHit) => {
+      // SearchHit is the lean tRPC return type (no Json fields). Resolve the full
+      // PersonRow from the persons prop so DetailPanel gets sources, bio, dates etc.
+      const person = persons.find((p) => p.id === hit.id) ?? null
       setSelectedPerson(person)
       setIsSearchOpen(false)
 
       // Pan the canvas to that node
-      const node = nodes.find((n) => n.id === person.id)
+      const node = nodes.find((n) => n.id === hit.id)
       if (node) {
         setCenter(node.position.x, node.position.y, { zoom: 1.2, duration: 600 })
       }
     },
-    [nodes, setCenter]
+    [persons, nodes, setCenter]
   )
 
   return (
@@ -182,7 +185,7 @@ function TreePageClientInner({ persons }: TreePageClientInnerProps): JSX.Element
   )
 }
 
-export function TreePageClient({ persons }: TreePageClientInnerProps): JSX.Element {
+export function TreePageClient({ persons }: TreePageClientInnerProps): React.ReactElement {
   return (
     <ReactFlowProvider>
       <TreePageClientInner persons={persons} />

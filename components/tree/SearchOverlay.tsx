@@ -3,14 +3,17 @@
 // Keyboard: Cmd/Ctrl+K to open, Escape to close
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-import type { PersonRow } from '@/lib/tree/types'
+import type { SearchHit } from '@/lib/tree/types'
 import { BRANCH_COLOURS } from '@/lib/tree/types'
 import { trpc } from '@/lib/trpc/client'
 import { prepareForSearch } from '@/lib/i18n/arabic'
 
 export type SearchOverlayProps = {
   isOpen: boolean
-  onSelect: (person: PersonRow) => void
+  // onSelect receives SearchHit — the lean tRPC return type (no Json fields).
+  // The caller (TreePageClient) is responsible for resolving the full PersonRow
+  // from the local persons list using the SearchHit's id field.
+  onSelect: (hit: SearchHit) => void
   onClose: () => void
 }
 
@@ -42,7 +45,6 @@ export function SearchOverlay({
   // Autofocus on open
   useEffect(() => {
     if (isOpen) {
-      // Defer to next tick to ensure DOM is ready
       const frame = requestAnimationFrame(() => inputRef.current?.focus())
       return () => cancelAnimationFrame(frame)
     }
@@ -61,7 +63,7 @@ export function SearchOverlay({
 
   const preparedQuery = prepareForSearch(debouncedQuery)
 
-  const { data: results = [], isFetching } = trpc.search.fuzzy.useQuery(
+  const { data, isFetching } = trpc.search.fuzzy.useQuery(
     { q: preparedQuery, limit: 20 },
     {
       enabled: preparedQuery.length >= 1,
@@ -70,8 +72,8 @@ export function SearchOverlay({
   )
 
   const handleSelect = useCallback(
-    (person: PersonRow) => {
-      onSelect(person)
+    (hit: SearchHit) => {
+      onSelect(hit)
       onClose()
     },
     [onSelect, onClose]
@@ -145,24 +147,24 @@ export function SearchOverlay({
 
         {/* Results */}
         <ul className="overflow-y-auto" role="listbox">
-          {results.length === 0 && preparedQuery.length > 0 && !isFetching && (
+          {preparedQuery.length >= 1 && !isFetching && data?.length === 0 && (
             <li className="px-4 py-6 text-center text-sm text-gray-500">No results found</li>
           )}
 
-          {results.length === 0 && preparedQuery.length === 0 && (
+          {preparedQuery.length === 0 && (
             <li className="px-4 py-6 text-center text-sm text-gray-400">
               Type to search persons in the tree
             </li>
           )}
 
-          {(results as PersonRow[]).map((person) => {
-            const branchColour = person.branch ? BRANCH_COLOURS[person.branch] : '#6B7280'
+          {data?.map((hit) => {
+            const branchColour = hit.branch ? BRANCH_COLOURS[hit.branch] : '#6B7280'
             return (
-              <li key={person.id} role="option" aria-selected={false}>
+              <li key={hit.id} role="option" aria-selected={false}>
                 <button
                   type="button"
                   className="flex w-full items-center gap-3 px-4 py-2.5 text-start hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                  onClick={() => handleSelect(person)}
+                  onClick={() => handleSelect(hit)}
                 >
                   {/* Branch colour dot */}
                   <span
@@ -173,18 +175,18 @@ export function SearchOverlay({
 
                   <span className="flex flex-1 flex-col overflow-hidden">
                     <span dir="rtl" className="truncate text-sm font-semibold text-gray-900">
-                      {person.name_ar}
+                      {hit.name_ar}
                     </span>
-                    <span className="truncate text-xs text-gray-500">{person.name_en}</span>
+                    <span className="truncate text-xs text-gray-500">{hit.name_en}</span>
                   </span>
 
                   {/* Generation badge */}
-                  {person.generation !== null && (
+                  {hit.generation !== null && (
                     <span
                       className="flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
                       style={{ backgroundColor: branchColour }}
                     >
-                      {person.generation}
+                      {hit.generation}
                     </span>
                   )}
                 </button>

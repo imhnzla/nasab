@@ -2,6 +2,7 @@
 // Public route: /[locale]/person/[id]
 // Next.js 16: params is a Promise
 
+import React from 'react'
 import type { Metadata } from 'next'
 
 type PageProps = {
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function PersonPage({ params }: PageProps): Promise<JSX.Element> {
+export default async function PersonPage({ params }: PageProps): Promise<React.ReactElement> {
   const { id } = await params
   // TODO: Phase 1 — fetch person, render full biography with sources
   return <div>Person {id} — Phase 1</div>

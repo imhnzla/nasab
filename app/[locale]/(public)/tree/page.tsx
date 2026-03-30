@@ -1,11 +1,7 @@
-// Phase 1 — Interactive Family Tree
-// Public route: /[locale]/tree
-// Server component: fetches verified persons, passes to client wrapper
-
 import React from 'react'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import type { PersonRow } from '@/lib/tree/types'
+import type { PersonRow, MarriageRow } from '@/lib/tree/types'
 import { TreePageClient } from './TreePageClient'
 
 export const metadata: Metadata = {
@@ -21,18 +17,29 @@ export const metadata: Metadata = {
 export default async function TreePage(): Promise<React.ReactElement> {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
+  // Fetch persons
+  const { data: personsData, error: personsError } = await supabase
     .from('persons')
     .select('*')
     .eq('is_verified', true)
     .order('generation', { ascending: true })
 
-  if (error) {
-    // Surface error in UI gracefully — tree will render empty
-    console.error('[TreePage] Failed to fetch persons:', error.message)
+  if (personsError) {
+    console.error('[TreePage] Failed to fetch persons:', personsError.message)
   }
 
-  const persons: PersonRow[] = (data ?? []) as PersonRow[]
+  // Fetch marriages
+  const { data: marriagesData, error: marriagesError } = await supabase
+    .from('marriages')
+    .select('*')
+    .order('order_num', { ascending: true }) // optional ordering
 
-  return <TreePageClient persons={persons} />
+  if (marriagesError) {
+    console.error('[TreePage] Failed to fetch marriages:', marriagesError.message)
+  }
+
+  const persons: PersonRow[] = (personsData ?? []) as PersonRow[]
+  const marriages: MarriageRow[] = (marriagesData ?? []) as MarriageRow[]
+
+  return <TreePageClient persons={persons} marriages={marriages} />
 }

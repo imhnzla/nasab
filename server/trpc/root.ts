@@ -1,53 +1,19 @@
-// tRPC router — marriages CRUD
-import { z } from 'zod'
-import { TRPCError } from '@trpc/server'
-import { t } from '@/server/trpc/init'
-import { adminProcedure } from '@/server/trpc/middleware'
-import type { Database } from '@/lib/supabase/types'
+// tRPC app router — merges all sub-routers
+import { t } from './init'
+import { adminRouter } from './routers/admin'
+import { marriagesRouter } from './routers/marriage'
+import { personsRouter } from './routers/persons'
+import { searchRouter } from './routers/search'
+import { submissionsRouter } from './routers/submissions'
+import { usersRouter } from './routers/users'
 
-type MarriageRow = Database['public']['Tables']['marriages']['Row']
-
-export const marriagesRouter = t.router({
-  byPerson: t.procedure
-    .input(z.object({ personId: z.string().uuid() }))
-    .query(async ({ ctx, input }): Promise<MarriageRow[]> => {
-      const { data, error } = await ctx.supabase
-        .from('marriages')
-        .select('*')
-        .or(`husband_id.eq.${input.personId},wife_id.eq.${input.personId}`)
-        .order('order_num', { ascending: true })
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message })
-      return data ?? []
-    }),
-
-  listAll: t.procedure
-    .query(async ({ ctx }): Promise<MarriageRow[]> => {
-      const { data, error } = await ctx.supabase
-        .from('marriages')
-        .select('*')
-        .order('husband_id')
-        .order('order_num')
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message })
-      return data ?? []
-    }),
-
-  create: adminProcedure
-    .input(z.object({
-      husband_id:     z.string().uuid(),
-      wife_id:        z.string().uuid(),
-      date_hijri:     z.string().optional(),
-      date_gregorian: z.string().optional(),
-      order_num:      z.number().int().min(1).default(1),
-      notes_ar:       z.string().optional(),
-      notes_en:       z.string().optional(),
-    }))
-    .mutation(async ({ ctx, input }) => {
-      const { data, error } = await ctx.supabase
-        .from('marriages')
-        .insert(input)
-        .select()
-        .single()
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message })
-      return data
-    }),
+export const appRouter = t.router({
+  admin: adminRouter,
+  marriages: marriagesRouter,
+  persons: personsRouter,
+  search: searchRouter,
+  submissions: submissionsRouter,
+  users: usersRouter,
 })
+
+export type AppRouter = typeof appRouter

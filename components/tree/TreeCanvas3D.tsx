@@ -5,7 +5,7 @@
 import React, { useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
-import type { PersonRow, MarriageRow, Branch } from '@/lib/tree/types'
+import type { PersonRow, MarriageRow } from '@/lib/tree/types'
 import type { LayoutNode } from '@/lib/workers/layout.worker'
 import { PLANE_GAP } from '@/lib/tree/constants3d'
 import { GenerationPlane }   from './GenerationPlane'

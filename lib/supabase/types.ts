@@ -34,6 +34,7 @@
 // evaluated lazily. Prevents TS2589 when Json flows through tRPC/supabase-js
 // deep conditional type chains.
 export interface JsonObject { [key: string]: Json | undefined }
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface JsonArray extends Array<Json> {}
 export type Json = string | number | boolean | null | JsonObject | JsonArray
 
@@ -207,6 +208,7 @@ export type Database = {
       }
     }
     // Views must be present for Database['public'] to satisfy GenericSchema.
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     Views: {}
     Functions: {
       search_persons: {

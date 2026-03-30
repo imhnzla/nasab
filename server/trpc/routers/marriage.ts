@@ -44,7 +44,16 @@ export const marriagesRouter = t.router({
     .mutation(async ({ ctx, input }) => {
       const { data, error } = await ctx.supabase
         .from('marriages')
-        .insert(input)
+        .insert({
+          husband_id:     input.husband_id,
+          wife_id:        input.wife_id,
+          order_num:      input.order_num,
+          is_verified:    false,
+          date_hijri:     input.date_hijri     ?? null,
+          date_gregorian: input.date_gregorian ?? null,
+          notes_ar:       input.notes_ar       ?? null,
+          notes_en:       input.notes_en       ?? null,
+        })
         .select()
         .single()
       if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message })

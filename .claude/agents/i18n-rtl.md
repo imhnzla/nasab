@@ -61,12 +61,13 @@ Arabic keys are written first; English keys mirror them exactly.
 4. The `<html>` tag must carry `dir` and `lang` attributes set by the locale layout:
    ```tsx
    // app/[locale]/layout.tsx
-   <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+   <html lang={locale} dir={locale === 'ar' || locale === 'ur' || locale === 'fa' ? 'rtl' : 'ltr'}>
    ```
 
 ## Date Formatting
 
 All historical dates show **both** Hijri and Gregorian:
+
 ```tsx
 // lib/i18n/hijri.ts
 formatDualDate(hijri: string, gregorian: Date | null): string

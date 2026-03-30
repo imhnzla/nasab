@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useReactFlow, ReactFlowProvider } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
-import type { PersonRow, Branch, PersonFlowNode, FamilyEdge, SearchHit } from '@/lib/tree/types'
+import type { PersonRow, Branch, PersonFlowNode, FamilyEdge, SearchHit, MarriageRow } from '@/lib/tree/types'
 import type { LayoutNode, LayoutWorkerOutput } from '@/lib/workers/layout.worker'
 import { TreeCanvas } from '@/components/tree/TreeCanvas'
 import { BranchFilter } from '@/components/tree/BranchFilter'
@@ -16,6 +16,7 @@ import { ExportButton } from '@/components/tree/ExportButton'
 
 type TreePageClientInnerProps = {
   persons: PersonRow[]
+  marriages: MarriageRow[]   // Added: marriages data required for DetailPanel
 }
 
 const ALL_BRANCHES: Branch[] = ['hasanid', 'husaynid', 'hashemite']
@@ -29,7 +30,7 @@ function layoutNodesToFlowNodes(layoutNodes: LayoutNode[]): PersonFlowNode[] {
   }))
 }
 
-function TreePageClientInner({ persons }: TreePageClientInnerProps): React.ReactElement {
+function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): React.ReactElement {
   const { setCenter } = useReactFlow()
 
   const [nodes, setNodes] = useState<PersonFlowNode[]>([])
@@ -172,8 +173,13 @@ function TreePageClientInner({ persons }: TreePageClientInnerProps): React.React
         </main>
       </div>
 
-      {/* Detail panel */}
-      <DetailPanel person={selectedPerson} onClose={() => setSelectedPerson(null)} />
+      {/* Detail panel — now receives both marriages and persons */}
+      <DetailPanel
+        person={selectedPerson}
+        marriages={marriages}
+        persons={persons}
+        onClose={() => setSelectedPerson(null)}
+      />
 
       {/* Search overlay */}
       <SearchOverlay
@@ -185,10 +191,10 @@ function TreePageClientInner({ persons }: TreePageClientInnerProps): React.React
   )
 }
 
-export function TreePageClient({ persons }: TreePageClientInnerProps): React.ReactElement {
+export function TreePageClient({ persons, marriages }: TreePageClientInnerProps): React.ReactElement {
   return (
     <ReactFlowProvider>
-      <TreePageClientInner persons={persons} />
+      <TreePageClientInner persons={persons} marriages={marriages} />
     </ReactFlowProvider>
   )
 }

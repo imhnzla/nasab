@@ -1,60 +1,92 @@
 {
-  "home.title": "NASAB — Global Shajra Nasab Platform",
-  "home.subtitle": "Preserving, verifying, and connecting the lineage of the Prophet worldwide",
-  "nav.home": "Home",
-  "nav.tree": "Family Tree",
-  "nav.search": "Search",
-  "nav.submit": "Submit Lineage",
-  "nav.dashboard": "Dashboard",
-  "nav.admin": "Admin",
-  "nav.login": "Log In",
-  "nav.register": "Register",
-  "nav.logout": "Log Out",
-  "tree.title": "Prophetic Family Tree",
-  "tree.filter.all": "All",
-  "tree.filter.hasanid": "Hasanid",
-  "tree.filter.husaynid": "Husaynid",
-  "tree.filter.hashemite": "Hashemite",
-  "tree.export": "Export",
-  "tree.loading": "Loading tree...",
-  "tree.search_placeholder": "Search for a person...",
-  "tree.zoom_in": "Zoom in",
-  "tree.zoom_out": "Zoom out",
-  "tree.reset_view": "Reset view",
-  "tree.no_data": "No data available",
-  "search.placeholder": "Search by name in Arabic or English...",
-  "search.no_results": "No results for \"{query}\"",
-  "search.results_count": "{count} result(s)",
-  "person.generation": "Generation {number}",
-  "person.branch.hasanid": "Hasanid",
-  "person.branch.husaynid": "Husaynid",
-  "person.branch.hashemite": "Hashemite",
-  "person.no_bio": "No biography available.",
-  "person.view_in_tree": "View in tree",
-  "person.born": "Born: {date}",
-  "person.died": "Died: {date}",
-  "person.sources": "Sources",
-  "person.tradition.sunni": "Sunni",
-  "person.tradition.shia": "Shia",
-  "person.tradition.both": "Agreed upon",
-  "submission.title": "Submit Your Lineage",
-  "submission.status.pending": "Pending",
-  "submission.status.under_review": "Under Review",
-  "submission.status.approved": "Approved",
-  "submission.status.rejected": "Rejected",
-  "auth.login": "Log In",
-  "auth.register": "Register",
-  "auth.email": "Email",
-  "auth.password": "Password",
-  "common.loading": "Loading...",
-  "common.error": "An error occurred",
-  "common.save": "Save",
-  "common.cancel": "Cancel",
-  "common.confirm": "Confirm",
-  "feature.verified.title": "Verified & Sourced",
-  "feature.verified.desc": "Every lineage is reviewed by specialist scholars with full citations to classical historical sources.",
-  "feature.inclusive.title": "Sunni & Shia",
-  "feature.inclusive.desc": "Both traditions are recognised with equal rigour and a unified methodology — no bias.",
-  "feature.connected.title": "Connecting Descendants",
-  "feature.connected.desc": "Descendants worldwide can submit their lineage for scholarly review and official documentation."
+  "home": {
+    "title": "NASAB — Global Shajra Nasab Platform",
+    "subtitle": "Preserving, verifying, and connecting the lineage of the Prophet worldwide"
+  },
+  "nav": {
+    "home": "Home",
+    "tree": "Family Tree",
+    "search": "Search",
+    "submit": "Submit Lineage",
+    "dashboard": "Dashboard",
+    "admin": "Admin",
+    "login": "Log In",
+    "register": "Register",
+    "logout": "Log Out"
+  },
+  "tree": {
+    "title": "Prophetic Family Tree",
+    "filter": {
+      "all": "All",
+      "hasanid": "Hasanid",
+      "husaynid": "Husaynid",
+      "hashemite": "Hashemite"
+    },
+    "export": "Export",
+    "loading": "Loading tree...",
+    "search_placeholder": "Search for a person...",
+    "zoom_in": "Zoom in",
+    "zoom_out": "Zoom out",
+    "reset_view": "Reset view",
+    "no_data": "No data available"
+  },
+  "search": {
+    "placeholder": "Search by name in Arabic or English...",
+    "no_results": "No results for \"{query}\"",
+    "results_count": "{count} result(s)"
+  },
+  "person": {
+    "generation": "Generation {number}",
+    "branch": {
+      "hasanid": "Hasanid",
+      "husaynid": "Husaynid",
+      "hashemite": "Hashemite"
+    },
+    "no_bio": "No biography available.",
+    "view_in_tree": "View in tree",
+    "born": "Born: {date}",
+    "died": "Died: {date}",
+    "sources": "Sources",
+    "tradition": {
+      "sunni": "Sunni",
+      "shia": "Shia",
+      "both": "Agreed upon"
+    }
+  },
+  "submission": {
+    "title": "Submit Your Lineage",
+    "status": {
+      "pending": "Pending",
+      "under_review": "Under Review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "auth": {
+    "login": "Log In",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "feature": {
+    "verified": {
+      "title": "Verified & Sourced",
+      "desc": "Every lineage is reviewed by specialist scholars with full citations to classical historical sources."
+    },
+    "inclusive": {
+      "title": "Sunni & Shia",
+      "desc": "Both traditions are recognised with equal rigour and a unified methodology — no bias."
+    },
+    "connected": {
+      "title": "Connecting Descendants",
+      "desc": "Descendants worldwide can submit their lineage for scholarly review and official documentation."
+    }
+  }
 }

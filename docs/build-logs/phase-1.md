@@ -111,3 +111,44 @@ All 30 persons added via `supabase/seed.sql`. See seed data table above.
 | 2026-03-29 | Split `TreePageClient` into outer + inner  | `useReactFlow()` requires a `ReactFlowProvider` ancestor; split avoids circular dependency             |
 | 2026-03-29 | `SECURITY DEFINER` SQL function for search | Supabase JS client cannot use `%` trigram operator directly; RPC call is the only way                  |
 | 2026-03-29 | `father_id` for Hasan/Husayn → Fatimah     | Prophetic lineage passes through Fatimah per hadith; enables correct tree topology                     |
+
+---
+
+### 2026-03-30 — TypeScript Build Fix (TS2589 + TS2345)
+
+`npm run build` was failing with two TypeScript errors originating from three structural defects in the hand-written `lib/supabase/types.ts`. All defects stem from the same root: the type file was not conformant with `supabase-js` v2.100+ and the tRPC v11 type machinery.
+
+**Errors:**
+
+| Error | Location | Message |
+|-------|----------|---------|
+| TS2589 | `components/tree/SearchOverlay.tsx:64` | Type instantiation is excessively deep and possibly infinite |
+| TS2345 | `server/trpc/routers/search.ts:27` | Argument not assignable to parameter of type `undefined` |
+
+**Root causes (three defects, one file):**
+
+1. **`Json` was a recursive type alias** — `type Json = ... | Json[]`. TypeScript expands recursive type aliases eagerly. `PersonRow` has `sources: Json` and `titles: Json`. When `PersonRow[]` was the tRPC procedure return type, tRPC v11's conditional type chain (`inferProcedureOutput` → `DeepPartial` → `TRPCRequestOptions`) forced TypeScript to expand `Json` at every nesting level until it hit the instantiation depth limit → TS2589. **Fix:** replaced with lazy interfaces (`interface JsonObject`, `interface JsonArray extends Array<Json>`). Interface bodies are evaluated lazily, breaking the expansion chain.
+
+2. **`Relationships` was missing from every table** — `supabase-js` v2.100+ defines `GenericTable = { Row; Insert; Update; Relationships: GenericRelationship[] }`. Without it, each table didn't satisfy `GenericTable` → `Database['public']` didn't satisfy `GenericSchema` → `Schema = never` inside `SupabaseClient` generics → `Schema['Functions']['search_persons']['Args'] = never` → `rpc(fn, args?)` typed as `rpc(fn, undefined)` → TS2345. **Fix:** added `Relationships` tuple to all four tables.
+
+3. **`Views` key was absent** — `GenericSchema` requires `{ Tables, Views, Functions }`. Missing `Views` triggered the same `Schema = never` cascade. **Fix:** added `Views: {}`.
+
+**Additional architectural change — `SearchHit` lean return type:**
+
+Even with the above fixes, returning `PersonRow[]` from the tRPC search procedure would leave the system one schema change away from regressing. `PersonRow` contains `sources: Json` and `titles: Json` which are never used by `SearchOverlay`. The procedure now returns `SearchHit[]` — a flat 7-field type with no `Json` columns. `TreePageClient.handleSearchSelect` receives `SearchHit`, resolves the full `PersonRow` from the local `persons` prop by `id`, and passes it to `setSelectedPerson` so `DetailPanel` still receives the complete row.
+
+**`rpcArgs` pre-typing in `search.ts`:**
+
+`supabase-js` v2.100+'s `rpc()` overload evaluates `GetRpcFunctionFilterBuilderByArgs` (a three-layer conditional type chain) as a constraint for `FilterBuilder` during inference. Under this, TypeScript can give up inferring `Args` mid-chain and default to `never`. Pre-typing the args object as `Database['public']['Functions']['search_persons']['Args']` makes the type explicit at the call site, bypassing inference entirely.
+
+**Files changed:**
+
+| File | Change |
+|------|--------|
+| `lib/supabase/types.ts` | `Json` → lazy interfaces; `PersonsRow` lifted out of `Database`; `Relationships` added to all 4 tables; `Views: {}` added; `Functions['search_persons']['Returns']` uses `unknown` for `sources`/`titles` |
+| `lib/tree/types.ts` | `SearchHit` type exported (7 flat primitive fields, no `Json`) |
+| `server/trpc/routers/search.ts` | Return type `PersonRow[]` → `SearchHit[]`; `rpcArgs` pre-typed; rows mapped to `SearchHit` before return |
+| `components/tree/SearchOverlay.tsx` | `PersonRow` → `SearchHit` throughout; `onSelect` prop type updated |
+| `app/[locale]/(public)/tree/TreePageClient.tsx` | `SearchHit` imported; `handleSearchSelect` resolves full `PersonRow` from `persons` prop via `hit.id` |
+
+**Result:** `npx tsc --noEmit` → 0 errors. `npm run build` → clean, all 24 routes built.

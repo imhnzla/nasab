@@ -28,16 +28,24 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   await supabase.auth.getSession()
 
   // 3. Route protection (Phase 3+)
-  // Strip locale prefix to check the path
-  const pathname = request.nextUrl.pathname.replace(/^\/(ar|en)/, '')
+  // With localePrefix: 'as-needed', default locale (ar) paths have no prefix.
+  // Strip the locale prefix only if present so the check works for both:
+  //   /en/dashboard  →  strip /en  →  /dashboard  (explicit prefix)
+  //   /dashboard     →  no strip   →  /dashboard  (default locale, no prefix)
+  const rawPath = request.nextUrl.pathname
+  const localeSegment = routing.locales.find((l) => rawPath.startsWith(`/${l}/`) || rawPath === `/${l}`)
+  const pathname = localeSegment ? rawPath.replace(`/${localeSegment}`, '') || '/' : rawPath
 
   if (PROTECTED_PATHS.some((p) => pathname.startsWith(p))) {
     const {
       data: { session },
     } = await supabase.auth.getSession()
     if (!session) {
-      const loginUrl = new URL(`/${request.nextUrl.pathname.split('/')[1]}/login`, request.url)
-      loginUrl.searchParams.set('next', request.nextUrl.pathname)
+      // Derive locale for the login redirect URL.
+      // If an explicit prefix is present use it; otherwise use the default locale.
+      const locale = localeSegment ?? routing.defaultLocale
+      const loginUrl = new URL(`/${locale}/login`, request.url)
+      loginUrl.searchParams.set('next', rawPath)
       return NextResponse.redirect(loginUrl)
     }
   }

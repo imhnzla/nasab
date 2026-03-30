@@ -1,60 +1,92 @@
 {
-  "home.title": "نسب — منصة شجرة النسب الشريف",
-  "home.subtitle": "حفظ النسب الشريف وتوثيقه وربطه بالأحفاد في جميع أنحاء العالم",
-  "nav.home": "الرئيسية",
-  "nav.tree": "شجرة النسب",
-  "nav.search": "البحث",
-  "nav.submit": "أضف نسبك",
-  "nav.dashboard": "لوحة التحكم",
-  "nav.admin": "الإدارة",
-  "nav.login": "تسجيل الدخول",
-  "nav.register": "إنشاء حساب",
-  "nav.logout": "تسجيل الخروج",
-  "tree.title": "شجرة النسب الشريف",
-  "tree.filter.all": "الكل",
-  "tree.filter.hasanid": "الحسنيون",
-  "tree.filter.husaynid": "الحسينيون",
-  "tree.filter.hashemite": "الهاشميون",
-  "tree.export": "تصدير",
-  "tree.loading": "جارٍ تحميل الشجرة...",
-  "tree.search_placeholder": "ابحث عن شخص...",
-  "tree.zoom_in": "تكبير",
-  "tree.zoom_out": "تصغير",
-  "tree.reset_view": "إعادة ضبط العرض",
-  "tree.no_data": "لا توجد بيانات",
-  "search.placeholder": "ابحث بالاسم بالعربية أو الإنجليزية...",
-  "search.no_results": "لا توجد نتائج لـ \"{query}\"",
-  "search.results_count": "{count} نتيجة",
-  "person.generation": "الجيل {number}",
-  "person.branch.hasanid": "الحسنيون",
-  "person.branch.husaynid": "الحسينيون",
-  "person.branch.hashemite": "الهاشميون",
-  "person.no_bio": "لا توجد سيرة ذاتية متاحة.",
-  "person.view_in_tree": "عرض في الشجرة",
-  "person.born": "وُلد: {date}",
-  "person.died": "تُوفِّي: {date}",
-  "person.sources": "المصادر",
-  "person.tradition.sunni": "السنة",
-  "person.tradition.shia": "الشيعة",
-  "person.tradition.both": "متفق عليه",
-  "submission.title": "أضف نسبك",
-  "submission.status.pending": "قيد الانتظار",
-  "submission.status.under_review": "قيد المراجعة",
-  "submission.status.approved": "مقبول",
-  "submission.status.rejected": "مرفوض",
-  "auth.login": "تسجيل الدخول",
-  "auth.register": "إنشاء حساب",
-  "auth.email": "البريد الإلكتروني",
-  "auth.password": "كلمة المرور",
-  "common.loading": "جارٍ التحميل...",
-  "common.error": "حدث خطأ",
-  "common.save": "حفظ",
-  "common.cancel": "إلغاء",
-  "common.confirm": "تأكيد",
-  "feature.verified.title": "موثَّق ومحقَّق",
-  "feature.verified.desc": "كل نسب يُراجَع من قِبَل علماء متخصصين، مع استشهاد كامل بالمصادر التاريخية الكلاسيكية.",
-  "feature.inclusive.title": "سني وشيعي",
-  "feature.inclusive.desc": "نعترف بكلا التقليدين بمنهجية موحّدة وصرامة علمية متساوية، دون تحيّز.",
-  "feature.connected.title": "ربط الأحفاد",
-  "feature.connected.desc": "يستطيع الأحفاد في كل أنحاء العالم تقديم نسبهم للمراجعة والتوثيق الرسمي."
+  "home": {
+    "title": "نسب — منصة شجرة النسب الشريف",
+    "subtitle": "حفظ النسب الشريف وتوثيقه وربطه بالأحفاد في جميع أنحاء العالم"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "tree": "شجرة النسب",
+    "search": "البحث",
+    "submit": "أضف نسبك",
+    "dashboard": "لوحة التحكم",
+    "admin": "الإدارة",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "logout": "تسجيل الخروج"
+  },
+  "tree": {
+    "title": "شجرة النسب الشريف",
+    "filter": {
+      "all": "الكل",
+      "hasanid": "الحسنيون",
+      "husaynid": "الحسينيون",
+      "hashemite": "الهاشميون"
+    },
+    "export": "تصدير",
+    "loading": "جارٍ تحميل الشجرة...",
+    "search_placeholder": "ابحث عن شخص...",
+    "zoom_in": "تكبير",
+    "zoom_out": "تصغير",
+    "reset_view": "إعادة ضبط العرض",
+    "no_data": "لا توجد بيانات"
+  },
+  "search": {
+    "placeholder": "ابحث بالاسم بالعربية أو الإنجليزية...",
+    "no_results": "لا توجد نتائج لـ \"{query}\"",
+    "results_count": "{count} نتيجة"
+  },
+  "person": {
+    "generation": "الجيل {number}",
+    "branch": {
+      "hasanid": "الحسنيون",
+      "husaynid": "الحسينيون",
+      "hashemite": "الهاشميون"
+    },
+    "no_bio": "لا توجد سيرة ذاتية متاحة.",
+    "view_in_tree": "عرض في الشجرة",
+    "born": "وُلد: {date}",
+    "died": "تُوفِّي: {date}",
+    "sources": "المصادر",
+    "tradition": {
+      "sunni": "السنة",
+      "shia": "الشيعة",
+      "both": "متفق عليه"
+    }
+  },
+  "submission": {
+    "title": "أضف نسبك",
+    "status": {
+      "pending": "قيد الانتظار",
+      "under_review": "قيد المراجعة",
+      "approved": "مقبول",
+      "rejected": "مرفوض"
+    }
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور"
+  },
+  "common": {
+    "loading": "جارٍ التحميل...",
+    "error": "حدث خطأ",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد"
+  },
+  "feature": {
+    "verified": {
+      "title": "موثَّق ومحقَّق",
+      "desc": "كل نسب يُراجَع من قِبَل علماء متخصصين، مع استشهاد كامل بالمصادر التاريخية الكلاسيكية."
+    },
+    "inclusive": {
+      "title": "سني وشيعي",
+      "desc": "نعترف بكلا التقليدين بمنهجية موحّدة وصرامة علمية متساوية، دون تحيّز."
+    },
+    "connected": {
+      "title": "ربط الأحفاد",
+      "desc": "يستطيع الأحفاد في كل أنحاء العالم تقديم نسبهم للمراجعة والتوثيق الرسمي."
+    }
+  }
 }

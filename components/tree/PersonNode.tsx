@@ -1,7 +1,6 @@
 'use client'
-// Phase 1 — Custom @xyflow/react node
-// Displays: Arabic name (primary), English name (secondary), branch colour border,
-// generation badge, verified checkmark
+// Custom @xyflow/react node
+// Female persons render as ovals; dual-border shows mother's branch; collapse toggle
 
 import React, { memo } from 'react'
 import { Handle, Position } from '@xyflow/react'
@@ -11,7 +10,8 @@ import { BRANCH_COLOURS } from '@/lib/tree/types'
 
 function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): React.ReactElement {
   const { person } = data
-  const branchColour = person.branch ? BRANCH_COLOURS[person.branch] : '#6B7280'
+  const branchColour   = person.branch ? BRANCH_COLOURS[person.branch] : '#6B7280'
+  const isFemalePerson = person.gender === 'female'
 
   return (
     <>
@@ -19,16 +19,30 @@ function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): React.R
 
       <div
         className={[
-          'relative flex h-[64px] w-[180px] flex-col justify-center rounded-md bg-white px-2 shadow-sm',
-          'border-2',
+          'relative flex h-[64px] w-[180px] flex-col justify-center px-2 shadow-sm border-2',
+          isFemalePerson ? 'rounded-[50%]' : 'rounded-md',
           selected ? 'ring-2 ring-offset-1' : '',
         ].join(' ')}
         style={{
           borderColor: branchColour,
-          ...(selected ? { ringColor: branchColour } : {}),
+          background: isFemalePerson ? `${branchColour}12` : '#fff',
+          ...(selected ? { outline: `2px solid ${branchColour}` } : {}),
         }}
       >
-        {/* Generation badge — top-right circle */}
+        {/* Inner border — mother's branch colour */}
+        {data.motherBranch && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 3,
+              borderRadius: isFemalePerson ? '50%' : 4,
+              border: `1.5px solid ${BRANCH_COLOURS[data.motherBranch]}`,
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+
+        {/* Generation badge */}
         {person.generation !== null && (
           <span
             className="absolute -end-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
@@ -49,7 +63,49 @@ function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): React.R
           </span>
         )}
 
-        {/* Arabic name — primary */}
+        {/* Female symbol */}
+        {isFemalePerson && (
+          <svg
+            width="10"
+            height="12"
+            style={{ position: 'absolute', bottom: 4, left: 6 }}
+            aria-hidden="true"
+          >
+            <circle cx="5" cy="4" r="3.5" fill="none" stroke={branchColour} strokeWidth="1.2" />
+            <line x1="5" y1="7.5" x2="5" y2="11" stroke={branchColour} strokeWidth="1.2" />
+            <line x1="3" y1="9.5" x2="7" y2="9.5" stroke={branchColour} strokeWidth="1.2" />
+          </svg>
+        )}
+
+        {/* Collapse toggle button */}
+        {data.onToggleCollapse && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              data.onToggleCollapse!(person.id)
+            }}
+            style={{
+              position: 'absolute',
+              bottom: -12,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: 10,
+              padding: '1px 6px',
+              borderRadius: 8,
+              background: branchColour,
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              zIndex: 10,
+            }}
+            aria-label={data.collapsedCount !== undefined ? 'Expand subtree' : 'Collapse subtree'}
+          >
+            {data.collapsedCount !== undefined ? `▶ ${data.collapsedCount}` : '−'}
+          </button>
+        )}
+
+        {/* Arabic name */}
         <p
           dir="rtl"
           className="truncate text-right text-sm leading-tight font-bold text-gray-900"
@@ -58,7 +114,7 @@ function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): React.R
           {person.name_ar}
         </p>
 
-        {/* English name — secondary */}
+        {/* English name */}
         <p
           className="truncate text-left text-xs leading-tight text-gray-500"
           title={person.name_en}

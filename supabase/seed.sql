@@ -550,3 +550,37 @@ INSERT INTO persons (
   '[]'::jsonb,
   true
 ) ON CONFLICT (id) DO NOTHING;
+
+-- ─── Marriage Seed Data (Feature 1) ─────────────────────────────────────────
+
+-- Fatima bint al-Husayn (daughter of al-Husayn, historically documented)
+INSERT INTO persons (id, name_ar, name_en, father_id, gender, branch,
+  scholarly_tradition, generation, is_verified)
+VALUES (
+  '00000000-0000-0000-0000-000000000031',
+  'فاطمة بنت الحسين', 'Fatima bint al-Husayn',
+  '00000000-0000-0000-0000-000000000005',
+  'female', 'husaynid', 'both', 4, true
+) ON CONFLICT (id) DO NOTHING;
+
+-- Update Fatima al-Zahra gender (id 000000000002)
+UPDATE persons SET gender = 'female'
+WHERE id = '00000000-0000-0000-0000-000000000002';
+
+-- Cross-branch marriage: al-Hasan al-Muthanna ↔ Fatima bint al-Husayn
+INSERT INTO marriages (id, husband_id, wife_id, date_hijri, order_num, is_verified)
+VALUES (
+  '00000000-0000-0000-0000-000000000101',
+  '00000000-0000-0000-0000-000000000006',  -- al-Hasan al-Muthanna (Hasanid)
+  '00000000-0000-0000-0000-000000000031',  -- Fatima bint al-Husayn (Husaynid)
+  'c. 61 AH', 1, true
+) ON CONFLICT DO NOTHING;
+
+-- Link known children to their mother
+UPDATE persons
+SET mother_id   = '00000000-0000-0000-0000-000000000031',
+    marriage_id = '00000000-0000-0000-0000-000000000101'
+WHERE id IN (
+  '00000000-0000-0000-0000-000000000010',  -- Abdullah al-Kamil
+  '00000000-0000-0000-0000-000000000011'   -- Ibrahim ibn al-Hasan al-Muthanna
+);

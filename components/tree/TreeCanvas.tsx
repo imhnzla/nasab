@@ -1,5 +1,5 @@
 'use client'
-// Phase 1 — Root @xyflow/react wrapper with zoom/pan, background, controls, minimap
+// Root @xyflow/react wrapper — registers all node and edge types
 
 import React, { useCallback, useEffect, useMemo } from 'react'
 import {
@@ -16,19 +16,33 @@ import {
 import type { NodeTypes, EdgeTypes, Connection, NodeMouseHandler } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
-import type { PersonFlowNode, FamilyEdge } from '@/lib/tree/types'
-import { PersonNode } from './PersonNode'
-import { EdgeRenderer } from './EdgeRenderer'
+import type { AnyFlowNode, FamilyEdge } from '@/lib/tree/types'
+import { PersonNode }        from './PersonNode'
+import { SpouseNode }        from './SpouseNode'
+import { JunctionNode }      from './JunctionNode'
+import { BracketNode }       from './BracketNode'
+import { EdgeRenderer }      from './EdgeRenderer'
+import { MarriageEdge }      from './MarriageEdge'
+import { CrossMarriageEdge } from './CrossMarriageEdge'
 
 export type TreeCanvasProps = {
-  nodes: PersonFlowNode[]
+  nodes: AnyFlowNode[]
   edges: FamilyEdge[]
   onNodeClick?: (personId: string) => void
 }
 
-// Stable references outside component to avoid re-renders
-const nodeTypes: NodeTypes = { person: PersonNode }
-const edgeTypes: EdgeTypes = { smoothstep: EdgeRenderer }
+const nodeTypes: NodeTypes = {
+  person:   PersonNode   as NodeTypes[string],
+  spouse:   SpouseNode   as NodeTypes[string],
+  junction: JunctionNode as NodeTypes[string],
+  bracket:  BracketNode  as NodeTypes[string],
+}
+
+const edgeTypes: EdgeTypes = {
+  smoothstep:    EdgeRenderer,
+  marriage:      MarriageEdge,
+  crossMarriage: CrossMarriageEdge,
+}
 
 const defaultEdgeOptions = {
   markerEnd: { type: MarkerType.ArrowClosed, color: '#9CA3AF', width: 16, height: 16 },
@@ -39,28 +53,20 @@ export function TreeCanvas({
   edges: initialEdges,
   onNodeClick,
 }: TreeCanvasProps): React.ReactElement {
-  const [nodes, setNodes, onNodesChange] = useNodesState<PersonFlowNode>(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState<FamilyEdge>(initialEdges)
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
 
-  // Sync when props change (e.g. after branch filter)
-  useEffect(() => {
-    setNodes(initialNodes)
-  }, [initialNodes, setNodes])
-
-  useEffect(() => {
-    setEdges(initialEdges)
-  }, [initialEdges, setEdges])
+  useEffect(() => { setNodes(initialNodes) }, [initialNodes, setNodes])
+  useEffect(() => { setEdges(initialEdges) }, [initialEdges, setEdges])
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
+    [setEdges],
   )
 
-  const handleNodeClick: NodeMouseHandler<PersonFlowNode> = useCallback(
-    (_event, node) => {
-      onNodeClick?.(node.id)
-    },
-    [onNodeClick]
+  const handleNodeClick: NodeMouseHandler = useCallback(
+    (_event, node) => { onNodeClick?.(node.id) },
+    [onNodeClick],
   )
 
   const proOptions = useMemo(() => ({ hideAttribution: false }), [])
@@ -87,11 +93,11 @@ export function TreeCanvas({
         <Controls />
         <MiniMap
           nodeColor={(node) => {
-            const flowNode = node as PersonFlowNode
-            if (flowNode.data?.person?.branch === 'hasanid') return '#1B5E20'
-            if (flowNode.data?.person?.branch === 'husaynid') return '#0D1B2A'
-            if (flowNode.data?.person?.branch === 'hashemite') return '#C9A84C'
-            return '#6B7280'
+            const branch = (node.data as { person?: { branch?: string } })?.person?.branch
+            if (branch === 'hasanid')  return '#1B5E20'
+            if (branch === 'husaynid') return '#0D1B2A'
+            if (branch === 'hashemite') return '#C9A84C'
+            return '#D4537E'
           }}
           maskColor="rgba(240, 240, 240, 0.6)"
         />

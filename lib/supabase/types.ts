@@ -56,6 +56,26 @@ export type PersonsRow = {
   titles: Json
   is_verified: boolean
   is_living: boolean
+  // Feature 1 columns — added by migration 20260401000000
+  gender: 'male' | 'female' | 'unknown'
+  mother_id: string | null
+  marriage_id: string | null
+  photo_url: string | null
+  created_at: string
+  updated_at: string
+}
+
+// MarriagesRow — added by migration 20260401000000
+export type MarriagesRow = {
+  id: string
+  husband_id: string
+  wife_id: string
+  date_hijri: string | null
+  date_gregorian: string | null
+  order_num: number
+  is_verified: boolean
+  notes_ar: string | null
+  notes_en: string | null
   created_at: string
   updated_at: string
 }
@@ -63,6 +83,27 @@ export type PersonsRow = {
 export type Database = {
   public: {
     Tables: {
+      marriages: {
+        Row: MarriagesRow
+        Insert: Omit<MarriagesRow, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<MarriagesRow, 'id' | 'created_at' | 'updated_at'>>
+        Relationships: [
+          {
+            foreignKeyName: 'marriages_husband_id_fkey'
+            columns: ['husband_id']
+            isOneToOne: false
+            referencedRelation: 'persons'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'marriages_wife_id_fkey'
+            columns: ['wife_id']
+            isOneToOne: false
+            referencedRelation: 'persons'
+            referencedColumns: ['id']
+          }
+        ]
+      }
       persons: {
         Row: PersonsRow
         Insert: Omit<PersonsRow, 'id' | 'created_at' | 'updated_at'>

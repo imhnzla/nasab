@@ -1,18 +1,13 @@
-// Shared TypeScript types for the Phase 1 interactive family tree
+// Shared TypeScript types for the NASAB family tree
 // Used by components/tree/* and the layout Web Worker
 
 import type { Node, Edge } from '@xyflow/react'
 import type { Database } from '@/lib/supabase/types'
 
 export type PersonRow = Database['public']['Tables']['persons']['Row']
+export type MarriageRow = Database['public']['Tables']['marriages']['Row']
 
 // SearchHit is the lean shape returned by the tRPC search.fuzzy procedure.
-// It deliberately excludes Json fields (sources, titles) and bulk text fields
-// (bio_ar, bio_en, dates) to keep the tRPC inferred output type shallow.
-// Json is a recursive type alias — when it flows through tRPC v11's nested
-// conditional types (inferProcedureOutput, DeepPartial, TRPCRequestOptions)
-// TypeScript hits its instantiation depth limit (TS2589). Keeping Json out of
-// the tRPC return type entirely is the correct structural fix.
 export type SearchHit = {
   id: string
   name_ar: string
@@ -35,24 +30,62 @@ export const BRANCH_COLOURS: Record<Branch, string> = {
 export const NODE_WIDTH = 180
 export const NODE_HEIGHT = 64
 
-// @xyflow/react typed node
+// ─── Node data types ────────────────────────────────────────────────────────
+
 export type PersonNodeData = {
   person: PersonRow
+  motherBranch?: Branch | null       // inner border = mother's branch
+  collapsedCount?: number            // set when node is collapsed; undefined = not collapsed
+  onToggleCollapse?: (id: string) => void
 }
 
-export type PersonFlowNode = Node<PersonNodeData, 'person'>
+export type SpouseNodeData = {
+  person: PersonRow
+  marriageId: string
+  marriageDate: string | null
+  order: number
+}
+
+export type JunctionNodeData = {
+  husbandId: string
+  wifeId: string
+  marriageId: string
+  onToggleCollapse?: (junctionId: string) => void
+  collapsedCount?: number
+}
+
+export type BracketNodeData = {
+  motherName_ar: string
+  motherName_en: string
+  motherBranch: Branch | null
+  spanPx: number
+}
+
+// ─── Flow node types ─────────────────────────────────────────────────────────
+
+export type PersonFlowNode   = Node<PersonNodeData,   'person'>
+export type SpouseFlowNode   = Node<SpouseNodeData,   'spouse'>
+export type JunctionFlowNode = Node<JunctionNodeData, 'junction'>
+export type BracketFlowNode  = Node<BracketNodeData,  'bracket'>
+
+export type AnyFlowNode = PersonFlowNode | SpouseFlowNode | JunctionFlowNode | BracketFlowNode
+
+// ─── Edge types ───────────────────────────────────────────────────────────────
+
 export type FamilyEdge = Edge
 
-// Layout worker message types
+// ─── Layout worker types ─────────────────────────────────────────────────────
+
 export type LayoutWorkerInput = {
   persons: PersonRow[]
+  marriages: MarriageRow[]
 }
 
 export type LayoutNode = {
   id: string
-  x: number
-  y: number
-  data: { person: PersonRow }
+  type: 'person' | 'spouse' | 'junction' | 'bracket'
+  position: { x: number; y: number }
+  data: PersonNodeData | SpouseNodeData | JunctionNodeData | BracketNodeData
 }
 
 export type LayoutWorkerOutput = {

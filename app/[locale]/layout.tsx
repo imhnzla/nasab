@@ -32,7 +32,7 @@ export default async function LocaleLayout({
   if (!routing.locales.includes(locale as Locale)) notFound()
 
   const messages = await getMessages()
-  const dir = locale === 'ar' ? 'rtl' : 'ltr'
+  const dir = locale === 'ar' || locale === 'ur' || locale === 'fa' ? 'rtl' : 'ltr'
 
   return (
     <html lang={locale} dir={dir}>

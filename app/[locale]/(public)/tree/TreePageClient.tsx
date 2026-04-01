@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useReactFlow, ReactFlowProvider } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
-import type { PersonRow, Branch, PersonFlowNode, FamilyEdge, SearchHit, MarriageRow } from '@/lib/tree/types'
+import type { AnyFlowNode, PersonRow, Branch, PersonFlowNode, FamilyEdge, SearchHit, MarriageRow } from '@/lib/tree/types'
 import type { LayoutNode, LayoutWorkerOutput } from '@/lib/workers/layout.worker'
 import { TreeCanvas } from '@/components/tree/TreeCanvas'
 import { BranchFilter } from '@/components/tree/BranchFilter'
@@ -21,19 +21,19 @@ type TreePageClientInnerProps = {
 
 const ALL_BRANCHES: Branch[] = ['hasanid', 'husaynid', 'hashemite']
 
-function layoutNodesToFlowNodes(layoutNodes: LayoutNode[]): PersonFlowNode[] {
+function layoutNodesToFlowNodes(layoutNodes: LayoutNode[]): AnyFlowNode[] {
   return layoutNodes.map((n) => ({
     id: n.id,
-    type: 'person' as const,
+    type: n.type,
     position: n.position,
-    data: { person: n.data.person as PersonRow },
-  }))
+    data: n.data,
+  })) as AnyFlowNode[]
 }
 
 function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): React.ReactElement {
   const { setCenter } = useReactFlow()
 
-  const [nodes, setNodes] = useState<PersonFlowNode[]>([])
+  const [nodes, setNodes] = useState<AnyFlowNode[]>([])
   const [edges, setEdges] = useState<FamilyEdge[]>([])
   const [activeBranches, setActiveBranches] = useState<Branch[]>(ALL_BRANCHES)
   const [selectedPerson, setSelectedPerson] = useState<PersonRow | null>(null)
@@ -59,17 +59,17 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
 
     const handleMessage = (e: MessageEvent<LayoutWorkerOutput>): void => {
       const { nodes: layoutNodes, edges: layoutEdges } = e.data
-      setNodes(layoutNodesToFlowNodes(layoutNodes))
+      setNodes(layoutNodesToFlowNodes(layoutNodes))   // now returns AnyFlowNode[]
       setEdges(layoutEdges as FamilyEdge[])
     }
 
     worker.addEventListener('message', handleMessage)
-    worker.postMessage({ persons: filtered })
+    worker.postMessage({ persons: filtered, marriages })
 
     return () => {
       worker.removeEventListener('message', handleMessage)
     }
-  }, [persons, activeBranches])
+  }, [persons, activeBranches, marriages])
 
   // Terminate worker on unmount
   useEffect(() => {

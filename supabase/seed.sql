@@ -584,3 +584,886 @@ WHERE id IN (
   '00000000-0000-0000-0000-000000000010',  -- Abdullah al-Kamil
   '00000000-0000-0000-0000-000000000011'   -- Ibrahim ibn al-Hasan al-Muthanna
 );
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- NASAB Seed Extension — Prophetic Family
+-- Wives of the Prophet ﷺ, his children, their spouses, and grandchildren
+-- ───────────────────────────────────────────────────────────────────────────────
+-- Append to seed.sql or run separately after the base seed.
+--
+-- Sources:
+--   Ibn Sa'd,          "Al-Tabaqat al-Kubra"          (الطبقات الكبرى)
+--   Ibn Hisham,        "Al-Sira al-Nabawiyya"          (السيرة النبوية)
+--   al-Baladhuri,      "Ansab al-Ashraf"               (أنساب الأشراف)
+--   Ibn Hazm,          "Jamharat Ansab al-Arab"         (جمهرة أنساب العرب)
+--   Ibn Kathir,        "Al-Bidaya wal-Nihaya"           (البداية والنهاية)
+--   al-Tabari,         "Tarikh al-Tabari"               (تاريخ الطبري)
+--   al-Dhahabi,        "Siyar A'lam al-Nubala'"         (سير أعلام النبلاء)
+--   Ibn Abd al-Barr,   "Al-Isti'ab fi Ma'rifat al-Ashab" (الاستيعاب)
+--   Ibn Hajar,         "Al-Isaba fi Tamyiz al-Sahaba"   (الإصابة في تمييز الصحابة)
+--
+-- UUID scheme (continuing from base seed):
+--   Persons:   032 – 099  (wives, children, spouses-in, grandchildren)
+--   Marriages: 102 – 130
+--
+-- Generation notes:
+--   Gen 1  = Prophet Muhammad ﷺ  (already in seed: 001)
+--   Gen 2  = Wives (no generation number — lateral, not descendant)
+--            Children of the Prophet (Gen 2 in descent)
+--   Gen 3  = Grandchildren of the Prophet (through daughters)
+--            Spouses of children are gen-2 lateral entries
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION A: WIVES OF THE PROPHET ﷺ
+-- Listed in order of marriage
+-- generation = NULL (wives are lateral entries, not descended from the Prophet)
+-- father_id  = NULL (their paternal lines are outside this tree)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- 032 — Khadijah bint Khuwaylid (first wife; mother of all surviving children)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000032',
+  'خديجة بنت خويلد',
+  'Khadijah bint Khuwaylid',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 68 BH', '3 BH', '0555-01-01', '0619-01-01',
+  '[{"title":"Al-Sira al-Nabawiyya","author":"Ibn Hisham","type":"classical_text"},{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم المؤمنين","title_en":"Mother of the Faithful"},{"title":"سيدة نساء قريش","title_en":"Lady of the Women of Quraysh"},{"title":"الطاهرة","title_en":"The Pure One"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 033 — Sawdah bint Zam'ah (second wife)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000033',
+  'سودة بنت زمعة',
+  'Sawdah bint Zam''ah',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 45 BH', 'c. 54 AH', '0578-01-01', '0674-01-01',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"},{"title":"Al-Isti''ab","author":"Ibn Abd al-Barr","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم المؤمنين","title_en":"Mother of the Faithful"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 034 — Aishah bint Abi Bakr (third wife; "Mother of the Faithful", narrator of hadith)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000034',
+  'عائشة بنت أبي بكر',
+  'Aishah bint Abi Bakr',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 9 BH', '58 AH', '0613-01-01', '0678-01-01',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Siyar A''lam al-Nubala''","author":"al-Dhahabi","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم المؤمنين","title_en":"Mother of the Faithful"},{"title":"الصديقة","title_en":"The Truthful One"},{"title":"حميراء","title_en":"The Rosy-Cheeked"},{"title":"أعلم النساء","title_en":"Most Knowledgeable of Women"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 035 — Hafsah bint Umar (fourth wife; daughter of Umar ibn al-Khattab, keeper of the Quran)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000035',
+  'حفصة بنت عمر',
+  'Hafsah bint Umar',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 18 BH', '45 AH', '0605-01-01', '0665-01-01',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"},{"title":"Siyar A''lam al-Nubala''","author":"al-Dhahabi","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم المؤمنين","title_en":"Mother of the Faithful"},{"title":"حافظة المصحف","title_en":"Guardian of the Quran Manuscript"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 036 — Zaynab bint Khuzaymah (fifth wife; known as Umm al-Masakin, died during the Prophet's lifetime)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000036',
+  'زينب بنت خزيمة',
+  'Zaynab bint Khuzaymah',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 30 BH', '4 AH', '0593-01-01', '0625-01-01',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم المؤمنين","title_en":"Mother of the Faithful"},{"title":"أم المساكين","title_en":"Mother of the Poor"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 037 — Umm Salamah bint Abi Umayyah (sixth wife; scholar and advisor, longest-lived wife)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000037',
+  'أم سلمة هند بنت أبي أمية',
+  'Umm Salamah Hind bint Abi Umayyah',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 28 BH', 'c. 61 AH', '0595-01-01', '0680-01-01',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Siyar A''lam al-Nubala''","author":"al-Dhahabi","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم المؤمنين","title_en":"Mother of the Faithful"},{"title":"الفقيهة","title_en":"The Jurist"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 038 — Zaynab bint Jahsh (seventh wife; marriage commanded by Quran, Surah al-Ahzab)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000038',
+  'زينب بنت جحش',
+  'Zaynab bint Jahsh',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 33 BH', '20 AH', '0590-01-01', '0641-01-01',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"},{"title":"Al-Bidaya wal-Nihaya","author":"Ibn Kathir","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم المؤمنين","title_en":"Mother of the Faithful"},{"title":"أم المساكين","title_en":"Mother of the Poor (known for charity)"},{"title":"الموصولة بالسماء","title_en":"The One Connected to Heaven (her marriage was revealed in Quran)"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 039 — Juwayriyyah bint al-Harith (eighth wife; her marriage caused the release of 100 captive families)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000039',
+  'جويرية بنت الحارث',
+  'Juwayriyyah bint al-Harith',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 22 BH', '56 AH', '0601-01-01', '0676-01-01',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم المؤمنين","title_en":"Mother of the Faithful"},{"title":"بركة قومها","title_en":"Blessing of her People (freed Banu Mustaliq captives)"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 040 — Ramlah bint Abi Sufyan (Umm Habibah; ninth wife; daughter of Abu Sufyan)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000040',
+  'رملة بنت أبي سفيان (أم حبيبة)',
+  'Ramlah bint Abi Sufyan (Umm Habibah)',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 29 BH', '44 AH', '0594-01-01', '0664-01-01',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Siyar A''lam al-Nubala''","author":"al-Dhahabi","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم المؤمنين","title_en":"Mother of the Faithful"},{"title":"أم حبيبة","title_en":"Umm Habibah (her kunya)"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 041 — Safiyyah bint Huyayy (tenth wife; from Banu Nadir, of Jewish origin, converted to Islam)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000041',
+  'صفية بنت حيي',
+  'Safiyyah bint Huyayy',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 28 BH', '50 AH', '0595-01-01', '0670-01-01',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"},{"title":"Siyar A''lam al-Nubala''","author":"al-Dhahabi","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم المؤمنين","title_en":"Mother of the Faithful"},{"title":"بنت ملك بني النضير","title_en":"Daughter of the Chief of Banu Nadir"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 042 — Maymunah bint al-Harith (eleventh wife; last wife the Prophet married)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000042',
+  'ميمونة بنت الحارث',
+  'Maymunah bint al-Harith',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 27 BH', '51 AH', '0596-01-01', '0671-01-01',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"},{"title":"Siyar A''lam al-Nubala''","author":"al-Dhahabi","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم المؤمنين","title_en":"Mother of the Faithful"},{"title":"برة","title_en":"Barrah (her name before Islam)"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- Note: Mariyah al-Qibtiyyah was a concubine (umm walad), not a wife in the
+-- legal sense (no marriage contract). She is the mother of Ibrahim ibn Muhammad.
+-- Included here for genealogical completeness.
+-- 043 — Mariyah al-Qibtiyyah (concubine; mother of Ibrahim ibn Muhammad)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_hijri, death_date_hijri, birth_date_gregorian, death_date_gregorian,
+  sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000043',
+  'مارية القبطية',
+  'Mariyah al-Qibtiyyah',
+  NULL, 'female', NULL, 'both', NULL,
+  'c. 22 BH', '16 AH', '0601-01-01', '0637-01-01',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[{"title":"أم إبراهيم","title_en":"Mother of Ibrahim"},{"title":"أم الولد","title_en":"Umm Walad (concubine who bore a child)"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION B: MARRIAGES OF THE PROPHET ﷺ
+-- UUID range: 102–114
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+INSERT INTO marriages (id, husband_id, wife_id, date_hijri, date_gregorian, order_num, is_verified, notes_en)
+VALUES
+  -- 1. Khadijah (married before Prophethood, 595 CE)
+  ('00000000-0000-0000-0000-000000000102',
+   '00000000-0000-0000-0000-000000000001',
+   '00000000-0000-0000-0000-000000000032',
+   'c. 25 BH', '0595-01-01', 1, true,
+   'First and only wife for 25 years until her death. All children except Ibrahim are from her.'),
+  -- 2. Sawdah (married shortly after Khadijah''s death)
+  ('00000000-0000-0000-0000-000000000103',
+   '00000000-0000-0000-0000-000000000001',
+   '00000000-0000-0000-0000-000000000033',
+   'c. 3 BH', '0619-01-01', 2, true,
+   'Married after Khadijah''s death. No children from this marriage.'),
+  -- 3. Aishah (betrothed young; marriage consummated after migration)
+  ('00000000-0000-0000-0000-000000000104',
+   '00000000-0000-0000-0000-000000000001',
+   '00000000-0000-0000-0000-000000000034',
+   '1 AH', '0623-01-01', 3, true,
+   'No children from this marriage. Narrated thousands of hadith.'),
+  -- 4. Hafsah
+  ('00000000-0000-0000-0000-000000000105',
+   '00000000-0000-0000-0000-000000000001',
+   '00000000-0000-0000-0000-000000000035',
+   '3 AH', '0625-01-01', 4, true,
+   'No children from this marriage. Entrusted with the Quran manuscript.'),
+  -- 5. Zaynab bint Khuzaymah
+  ('00000000-0000-0000-0000-000000000106',
+   '00000000-0000-0000-0000-000000000001',
+   '00000000-0000-0000-0000-000000000036',
+   '3 AH', '0625-01-01', 5, true,
+   'Died approximately 8 months after marriage. No children.'),
+  -- 6. Umm Salamah
+  ('00000000-0000-0000-0000-000000000107',
+   '00000000-0000-0000-0000-000000000001',
+   '00000000-0000-0000-0000-000000000037',
+   '4 AH', '0626-01-01', 6, true,
+   'She had children from her first husband. No children with the Prophet.'),
+  -- 7. Zaynab bint Jahsh
+  ('00000000-0000-0000-0000-000000000108',
+   '00000000-0000-0000-0000-000000000001',
+   '00000000-0000-0000-0000-000000000038',
+   '5 AH', '0627-01-01', 7, true,
+   'Marriage ordained in Surah al-Ahzab (33:37). No children.'),
+  -- 8. Juwayriyyah bint al-Harith
+  ('00000000-0000-0000-0000-000000000109',
+   '00000000-0000-0000-0000-000000000001',
+   '00000000-0000-0000-0000-000000000039',
+   '5 AH', '0627-01-01', 8, true,
+   'Marriage led Companions to free all Banu Mustaliq captives. No children.'),
+  -- 9. Umm Habibah (Ramlah bint Abi Sufyan)
+  ('00000000-0000-0000-0000-000000000110',
+   '00000000-0000-0000-0000-000000000001',
+   '00000000-0000-0000-0000-000000000040',
+   '6 AH', '0628-01-01', 9, true,
+   'Contracted in Abyssinia by Negus on behalf of the Prophet. No children with Prophet.'),
+  -- 10. Safiyyah bint Huyayy
+  ('00000000-0000-0000-0000-000000000111',
+   '00000000-0000-0000-0000-000000000001',
+   '00000000-0000-0000-0000-000000000041',
+   '7 AH', '0629-01-01', 10, true,
+   'Married after Khaybar. No children.'),
+  -- 11. Maymunah bint al-Harith (last wife)
+  ('00000000-0000-0000-0000-000000000112',
+   '00000000-0000-0000-0000-000000000001',
+   '00000000-0000-0000-0000-000000000042',
+   '7 AH', '0629-01-01', 11, true,
+   'Last wife; married during the Umrah al-Qada. No children.')
+ON CONFLICT DO NOTHING;
+
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION C: CHILDREN OF THE PROPHET ﷺ
+-- All by Khadijah except Ibrahim (by Mariyah al-Qibtiyyah)
+-- Generation 2 in the descent tree
+-- father_id = 001 (Prophet Muhammad)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- Note: Seed already has Fatimah al-Zahra (id 002). We update her mother_id here.
+-- The existing seed did not assign mother_id or marriage_id to her.
+
+UPDATE persons
+SET mother_id   = '00000000-0000-0000-0000-000000000032',
+    marriage_id = '00000000-0000-0000-0000-000000000102',
+    gender      = 'female'
+WHERE id = '00000000-0000-0000-0000-000000000002';  -- Fatimah al-Zahra
+
+-- ── Sons (all died in infancy or childhood) ──────────────────────────────────
+
+-- 044 — Al-Qasim ibn Muhammad (first son; the Prophet took his kunya Abu al-Qasim from him)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000044',
+  'القاسم بن محمد',
+  'Al-Qasim ibn Muhammad',
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000032',
+  '00000000-0000-0000-0000-000000000102',
+  'male', NULL, 'both', 2,
+  '0598-01-01', '0600-01-01',
+  'c. 33 BH', 'c. 31 BH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Bidaya wal-Nihaya","author":"Ibn Kathir","type":"classical_text"}]'::jsonb,
+  '[{"title":"أبو القاسم","title_en":"Abu al-Qasim (kunya taken by the Prophet)"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 045 — Abd Allah ibn Muhammad (also called al-Tayyib and al-Tahir; died in infancy)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000045',
+  'عبد الله بن محمد',
+  'Abd Allah ibn Muhammad',
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000032',
+  '00000000-0000-0000-0000-000000000102',
+  'male', NULL, 'both', 2,
+  '0611-01-01', '0612-01-01',
+  'c. 2 BH', 'c. 1 BH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Sira al-Nabawiyya","author":"Ibn Hisham","type":"classical_text"}]'::jsonb,
+  '[{"title":"الطيب","title_en":"Al-Tayyib (the Good)"},{"title":"الطاهر","title_en":"Al-Tahir (the Pure)"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 046 — Ibrahim ibn Muhammad (by Mariyah al-Qibtiyyah; born in Madinah, died at ~18 months)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000046',
+  'إبراهيم بن محمد',
+  'Ibrahim ibn Muhammad',
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000043',
+  'male', NULL, 'both', 2,
+  '0630-01-01', '0632-01-01',
+  '8 AH', '10 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Siyar A''lam al-Nubala''","author":"al-Dhahabi","type":"classical_text"}]'::jsonb,
+  '[]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- ── Daughters ─────────────────────────────────────────────────────────────────
+-- Note: Fatimah (id 002) already in seed. The other three daughters are added here.
+
+-- 047 — Zaynab bint Muhammad (eldest daughter; married Abul-As ibn al-Rabi)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000047',
+  'زينب بنت محمد',
+  'Zaynab bint Muhammad',
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000032',
+  '00000000-0000-0000-0000-000000000102',
+  'female', NULL, 'both', 2,
+  '0599-01-01', '0629-01-01',
+  'c. 30 BH', '8 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"}]'::jsonb,
+  '[{"title":"أكبر بنات النبي","title_en":"Eldest Daughter of the Prophet"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 048 — Ruqayyah bint Muhammad (second daughter; married Uthman ibn Affan, died at Battle of Badr)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000048',
+  'رقية بنت محمد',
+  'Ruqayyah bint Muhammad',
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000032',
+  '00000000-0000-0000-0000-000000000102',
+  'female', NULL, 'both', 2,
+  '0601-01-01', '0624-01-01',
+  'c. 28 BH', '2 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 049 — Umm Kulthum bint Muhammad (third daughter; married Uthman ibn Affan after Ruqayyah's death)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000049',
+  'أم كلثوم بنت محمد',
+  'Umm Kulthum bint Muhammad',
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000032',
+  '00000000-0000-0000-0000-000000000102',
+  'female', NULL, 'both', 2,
+  '0603-01-01', '0630-01-01',
+  'c. 26 BH', '9 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION D: SPOUSES OF THE PROPHET'S DAUGHTERS
+-- Lateral entries; father_id = NULL (their own lineage not tracked here)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- 050 — Abul-As ibn al-Rabi (husband of Zaynab bint Muhammad; nephew of Khadijah)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000050',
+  'أبو العاص بن الربيع',
+  'Abul-As ibn al-Rabi',
+  NULL, 'male', NULL, 'both', NULL,
+  '0580-01-01', '0633-01-01',
+  'c. 43 BH', '12 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[{"title":"الأمين","title_en":"The Trustworthy (praised by the Prophet)"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 051 — Uthman ibn Affan (husband of Ruqayyah, then Umm Kulthum; third Caliph)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000051',
+  'عثمان بن عفان',
+  'Uthman ibn Affan',
+  NULL, 'male', NULL, 'both', NULL,
+  '0576-01-01', '0656-01-01',
+  'c. 47 BH', '35 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Siyar A''lam al-Nubala''","author":"al-Dhahabi","type":"classical_text"},{"title":"Al-Bidaya wal-Nihaya","author":"Ibn Kathir","type":"classical_text"}]'::jsonb,
+  '[{"title":"ذو النورين","title_en":"The Possessor of Two Lights (married two daughters of the Prophet)"},{"title":"الخليفة الثالث","title_en":"Third Caliph"},{"title":"أمير المؤمنين","title_en":"Commander of the Faithful"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- Note: Ali ibn Abi Talib (id 003) married Fatimah al-Zahra (id 002). Already in seed.
+
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION E: MARRIAGES OF THE PROPHET'S DAUGHTERS
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- Marriage 113: Zaynab bint Muhammad ↔ Abul-As ibn al-Rabi
+INSERT INTO marriages (id, husband_id, wife_id, date_hijri, order_num, is_verified, notes_en)
+VALUES (
+  '00000000-0000-0000-0000-000000000113',
+  '00000000-0000-0000-0000-000000000050',
+  '00000000-0000-0000-0000-000000000047',
+  'c. 10 BH', 1, true,
+  'Married before Prophethood. After he accepted Islam (much later) their marriage was re-affirmed.'
+) ON CONFLICT DO NOTHING;
+
+-- Marriage 114: Ruqayyah bint Muhammad ↔ Uthman ibn Affan
+INSERT INTO marriages (id, husband_id, wife_id, date_hijri, order_num, is_verified, notes_en)
+VALUES (
+  '00000000-0000-0000-0000-000000000114',
+  '00000000-0000-0000-0000-000000000051',
+  '00000000-0000-0000-0000-000000000048',
+  'c. 2 BH', 1, true,
+  'Uthman migrated with Ruqayyah to Abyssinia. She died while he was at the Battle of Badr.'
+) ON CONFLICT DO NOTHING;
+
+-- Marriage 115: Umm Kulthum bint Muhammad ↔ Uthman ibn Affan (after Ruqayyah died)
+INSERT INTO marriages (id, husband_id, wife_id, date_hijri, order_num, is_verified, notes_en)
+VALUES (
+  '00000000-0000-0000-0000-000000000115',
+  '00000000-0000-0000-0000-000000000051',
+  '00000000-0000-0000-0000-000000000049',
+  '3 AH', 2, true,
+  'Second marriage for Uthman with the Prophet''s daughters; hence the title Dhu al-Nurayn.'
+) ON CONFLICT DO NOTHING;
+
+-- Marriage 116: Fatimah al-Zahra ↔ Ali ibn Abi Talib (already in seed; link records)
+INSERT INTO marriages (id, husband_id, wife_id, date_hijri, order_num, is_verified, notes_en)
+VALUES (
+  '00000000-0000-0000-0000-000000000116',
+  '00000000-0000-0000-0000-000000000003',
+  '00000000-0000-0000-0000-000000000002',
+  '2 AH', 1, true,
+  'The Prophet arranged this marriage himself. One of the most celebrated marriages in Islamic history.'
+) ON CONFLICT DO NOTHING;
+
+-- Link Hasan & Husayn to marriage 116
+UPDATE persons
+SET marriage_id = '00000000-0000-0000-0000-000000000116'
+WHERE id IN (
+  '00000000-0000-0000-0000-000000000004',  -- Al-Hasan ibn Ali
+  '00000000-0000-0000-0000-000000000005'   -- Al-Husayn ibn Ali
+);
+
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION F: GRANDCHILDREN OF THE PROPHET ﷺ
+-- Through his daughters only (the line continues only through Fatimah per hadith)
+-- Generation 3
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- ── Through Zaynab bint Muhammad ─────────────────────────────────────────────
+
+-- 052 — Umamah bint Abi al-As (granddaughter; the Prophet used to carry her during prayer)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000052',
+  'أمامة بنت أبي العاص',
+  'Umamah bint Abi al-As',
+  '00000000-0000-0000-0000-000000000050',
+  '00000000-0000-0000-0000-000000000047',
+  '00000000-0000-0000-0000-000000000113',
+  'female', NULL, 'both', 3,
+  '0606-01-01', '0661-01-01',
+  'c. 23 BH', 'c. 40 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[{"title":"حفيدة النبي","title_en":"Granddaughter of the Prophet (he carried her during salah)"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 053 — Ali ibn Abi al-As (grandson through Zaynab; died young)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000053',
+  'علي بن أبي العاص',
+  'Ali ibn Abi al-As',
+  '00000000-0000-0000-0000-000000000050',
+  '00000000-0000-0000-0000-000000000047',
+  '00000000-0000-0000-0000-000000000113',
+  'male', NULL, 'both', 3,
+  '0608-01-01', '0624-01-01',
+  'c. 21 BH', 'c. 3 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"}]'::jsonb,
+  '[]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- ── Through Ruqayyah bint Muhammad ───────────────────────────────────────────
+
+-- 054 — Abd Allah ibn Uthman (grandson; died at age 6; the Prophet wept at his grave)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000054',
+  'عبد الله بن عثمان',
+  'Abd Allah ibn Uthman',
+  '00000000-0000-0000-0000-000000000051',
+  '00000000-0000-0000-0000-000000000048',
+  '00000000-0000-0000-0000-000000000114',
+  'male', NULL, 'both', 3,
+  '0616-01-01', '0622-01-01',
+  'c. 5 BH', 'c. 4 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Al-Isaba fi Tamyiz al-Sahaba","author":"Ibn Hajar","type":"classical_text"}]'::jsonb,
+  '[]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- ── Through Fatimah al-Zahra (already have Hasan id=004 and Husayn id=005)
+-- Additional children of Fatimah and Ali:
+
+-- 055 — Zaynab bint Ali (great granddaughter of the Prophet through Fatimah; heroine of Karbala)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000055',
+  'زينب بنت علي',
+  'Zaynab bint Ali',
+  '00000000-0000-0000-0000-000000000003',
+  '00000000-0000-0000-0000-000000000002',
+  '00000000-0000-0000-0000-000000000116',
+  'female', NULL, 'both', 3,
+  '0627-01-01', '0682-01-01',
+  '5 AH', '62 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"},{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"}]'::jsonb,
+  '[{"title":"عقيلة بني هاشم","title_en":"The Noblewoman of Banu Hashim"},{"title":"أم المصائب","title_en":"Mother of Calamities"},{"title":"بطلة كربلاء","title_en":"Heroine of Karbala"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 056 — Umm Kulthum bint Ali (daughter of Fatimah and Ali; married Umar ibn al-Khattab per some narrations)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000056',
+  'أم كلثوم بنت علي',
+  'Umm Kulthum bint Ali',
+  '00000000-0000-0000-0000-000000000003',
+  '00000000-0000-0000-0000-000000000002',
+  '00000000-0000-0000-0000-000000000116',
+  'female', NULL, 'both', 3,
+  '0629-01-01', '0680-01-01',
+  '7 AH', '61 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"}]'::jsonb,
+  '[]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 057 — Muhsin ibn Ali (third son of Fatimah and Ali; died in early childhood per Shia narrations)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000057',
+  'محسن بن علي',
+  'Muhsin ibn Ali',
+  '00000000-0000-0000-0000-000000000003',
+  '00000000-0000-0000-0000-000000000002',
+  '00000000-0000-0000-0000-000000000116',
+  'male', NULL, 'both', 3,
+  '0630-01-01', '0632-01-01',
+  '8 AH', '10 AH',
+  '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"}]'::jsonb,
+  '[{"title":"المُحسن","title_en":"Muhsin — mentioned mainly in Shia sources, died in infancy"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION G: SPOUSES OF THE PROPHET'S GRANDCHILDREN
+-- (children of Fatimah and Ali, and children of Zaynab bint Muhammad)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- 058 — Abdullah ibn Jafar al-Tayyar (husband of Zaynab bint Ali; son of Jafar ibn Abi Talib)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000058',
+  'عبد الله بن جعفر الطيار',
+  'Abdullah ibn Jafar al-Tayyar',
+  NULL, 'male', 'hashemite', 'both', NULL,
+  '0619-01-01', '0699-01-01',
+  '2 AH', '80 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Siyar A''lam al-Nubala''","author":"al-Dhahabi","type":"classical_text"}]'::jsonb,
+  '[{"title":"بحر الجود","title_en":"Sea of Generosity — renowned for his charity"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 059 — Umar ibn al-Khattab (second Caliph; married Umm Kulthum bint Ali per narrations)
+-- Note: historically debated but recorded in classical sources.
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, gender, branch, scholarly_tradition, generation,
+  birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000059',
+  'عمر بن الخطاب',
+  'Umar ibn al-Khattab',
+  NULL, 'male', NULL, 'both', NULL,
+  '0584-01-01', '0644-01-01',
+  'c. 40 BH', '23 AH',
+  '[{"title":"Al-Tabaqat al-Kubra","author":"Ibn Sa''d","type":"classical_text"},{"title":"Siyar A''lam al-Nubala''","author":"al-Dhahabi","type":"classical_text"},{"title":"Al-Bidaya wal-Nihaya","author":"Ibn Kathir","type":"classical_text"}]'::jsonb,
+  '[{"title":"الفاروق","title_en":"Al-Faruq — The Distinguisher between Truth and Falsehood"},{"title":"الخليفة الثاني","title_en":"Second Caliph"},{"title":"أمير المؤمنين","title_en":"Commander of the Faithful"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- Marriage 117: Zaynab bint Ali ↔ Abdullah ibn Jafar
+INSERT INTO marriages (id, husband_id, wife_id, date_hijri, order_num, is_verified, notes_en)
+VALUES (
+  '00000000-0000-0000-0000-000000000117',
+  '00000000-0000-0000-0000-000000000058',
+  '00000000-0000-0000-0000-000000000055',
+  'c. 25 AH', 1, true,
+  'Ali ibn Abi Talib arranged this marriage for his daughter Zaynab.'
+) ON CONFLICT DO NOTHING;
+
+-- Marriage 118: Umm Kulthum bint Ali ↔ Umar ibn al-Khattab (contested in some traditions)
+INSERT INTO marriages (id, husband_id, wife_id, date_hijri, order_num, is_verified, notes_en)
+VALUES (
+  '00000000-0000-0000-0000-000000000118',
+  '00000000-0000-0000-0000-000000000059',
+  '00000000-0000-0000-0000-000000000056',
+  'c. 17 AH', 1, true,
+  'Recorded in Al-Tabaqat al-Kubra and other classical sources; debated in some Shia traditions.'
+) ON CONFLICT DO NOTHING;
+
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION H: CHILDREN OF ZAYNAB BINT ALI (great-grandchildren of the Prophet)
+-- Generation 4 through the Ali-Fatimah-Muhammad line
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- 060 — Ali ibn Abdullah ibn Jafar (son of Zaynab bint Ali)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000060',
+  'علي بن عبد الله بن جعفر',
+  'Ali ibn Abdullah ibn Jafar',
+  '00000000-0000-0000-0000-000000000058',
+  '00000000-0000-0000-0000-000000000055',
+  '00000000-0000-0000-0000-000000000117',
+  'male', NULL, 'both', 4,
+  '0647-01-01', '0714-01-01',
+  'c. 26 AH', 'c. 95 AH',
+  '[{"title":"Jamharat Ansab al-Arab","author":"Ibn Hazm","type":"classical_text"},{"title":"Ansab al-Ashraf","author":"al-Baladhuri","type":"classical_text"}]'::jsonb,
+  '[]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 061 — Awn ibn Abdullah ibn Jafar (son of Zaynab bint Ali; accompanied her to Karbala)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000061',
+  'عون بن عبد الله بن جعفر',
+  'Awn ibn Abdullah ibn Jafar',
+  '00000000-0000-0000-0000-000000000058',
+  '00000000-0000-0000-0000-000000000055',
+  '00000000-0000-0000-0000-000000000117',
+  'male', NULL, 'both', 4,
+  '0649-01-01', '0680-01-01',
+  'c. 28 AH', '61 AH',
+  '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"}]'::jsonb,
+  '[{"title":"شهيد كربلاء","title_en":"Martyr of Karbala"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 062 — Muhammad ibn Abdullah ibn Jafar (son of Zaynab bint Ali; also martyred at Karbala)
+INSERT INTO persons (
+  id, name_ar, name_en, father_id, mother_id, marriage_id, gender, branch,
+  scholarly_tradition, generation, birth_date_gregorian, death_date_gregorian,
+  birth_date_hijri, death_date_hijri, sources, titles, is_verified
+) VALUES (
+  '00000000-0000-0000-0000-000000000062',
+  'محمد بن عبد الله بن جعفر',
+  'Muhammad ibn Abdullah ibn Jafar',
+  '00000000-0000-0000-0000-000000000058',
+  '00000000-0000-0000-0000-000000000055',
+  '00000000-0000-0000-0000-000000000117',
+  'male', NULL, 'both', 4,
+  '0651-01-01', '0680-01-01',
+  'c. 30 AH', '61 AH',
+  '[{"title":"Al-Irshad","author":"al-Shaykh al-Mufid","type":"classical_text"},{"title":"Maqatil al-Talibiyyin","author":"Abu al-Faraj al-Isfahani","type":"classical_text"}]'::jsonb,
+  '[{"title":"شهيد كربلاء","title_en":"Martyr of Karbala"}]'::jsonb,
+  true
+) ON CONFLICT (id) DO NOTHING;
+
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION I: UMAMAH BINT ABI AL-AS — SPOUSE AND CHILDREN
+-- (granddaughter of the Prophet through Zaynab bint Muhammad;
+--  the Prophet carried Umamah during prayer — Sahih Bukhari)
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- 063 — Ali ibn Abi Talib married Umamah bint Abi al-As after Fatimah's death
+-- Ali (id 003) is already in seed. Marriage:
+INSERT INTO marriages (id, husband_id, wife_id, date_hijri, order_num, is_verified, notes_en)
+VALUES (
+  '00000000-0000-0000-0000-000000000119',
+  '00000000-0000-0000-0000-000000000003',
+  '00000000-0000-0000-0000-000000000052',
+  'c. 12 AH', 2, true,
+  'Fatimah herself requested on her deathbed that Ali marry Umamah. Recorded in Al-Tabaqat al-Kubra.'
+) ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- SECTION J: SUMMARY COMMENT — UUID REGISTRY
+-- ═══════════════════════════════════════════════════════════════════════════════
+--
+-- PERSONS ADDED IN THIS FILE:
+--  032  Khadijah bint Khuwaylid             (wife 1)
+--  033  Sawdah bint Zam'ah                  (wife 2)
+--  034  Aishah bint Abi Bakr                (wife 3)
+--  035  Hafsah bint Umar                    (wife 4)
+--  036  Zaynab bint Khuzaymah               (wife 5)
+--  037  Umm Salamah                         (wife 6)
+--  038  Zaynab bint Jahsh                   (wife 7)
+--  039  Juwayriyyah bint al-Harith          (wife 8)
+--  040  Ramlah / Umm Habibah                (wife 9)
+--  041  Safiyyah bint Huyayy                (wife 10)
+--  042  Maymunah bint al-Harith             (wife 11)
+--  043  Mariyah al-Qibtiyyah                (concubine / umm walad)
+--  044  Al-Qasim ibn Muhammad               (son, d. infancy)
+--  045  Abd Allah ibn Muhammad              (son, d. infancy)
+--  046  Ibrahim ibn Muhammad                (son by Mariyah, d. infancy)
+--  047  Zaynab bint Muhammad                (daughter)
+--  048  Ruqayyah bint Muhammad              (daughter)
+--  049  Umm Kulthum bint Muhammad           (daughter)
+--  050  Abul-As ibn al-Rabi                 (husband of Zaynab bint Muhammad)
+--  051  Uthman ibn Affan                    (husband of Ruqayyah then Umm Kulthum)
+--  052  Umamah bint Abi al-As               (granddaughter through Zaynab)
+--  053  Ali ibn Abi al-As                   (grandson through Zaynab, d. young)
+--  054  Abd Allah ibn Uthman                (grandson through Ruqayyah, d. age 6)
+--  055  Zaynab bint Ali                     (granddaughter through Fatimah)
+--  056  Umm Kulthum bint Ali                (granddaughter through Fatimah)
+--  057  Muhsin ibn Ali                      (grandson through Fatimah, d. infancy)
+--  058  Abdullah ibn Jafar al-Tayyar        (husband of Zaynab bint Ali)
+--  059  Umar ibn al-Khattab                 (husband of Umm Kulthum bint Ali)
+--  060  Ali ibn Abdullah ibn Jafar          (great-grandson through Zaynab bint Ali)
+--  061  Awn ibn Abdullah ibn Jafar          (great-grandson; martyred Karbala)
+--  062  Muhammad ibn Abdullah ibn Jafar     (great-grandson; martyred Karbala)
+--
+-- MARRIAGES ADDED IN THIS FILE:
+--  102  Prophet ↔ Khadijah
+--  103  Prophet ↔ Sawdah
+--  104  Prophet ↔ Aishah
+--  105  Prophet ↔ Hafsah
+--  106  Prophet ↔ Zaynab bint Khuzaymah
+--  107  Prophet ↔ Umm Salamah
+--  108  Prophet ↔ Zaynab bint Jahsh
+--  109  Prophet ↔ Juwayriyyah
+--  110  Prophet ↔ Umm Habibah
+--  111  Prophet ↔ Safiyyah
+--  112  Prophet ↔ Maymunah
+--  113  Abul-As ↔ Zaynab bint Muhammad
+--  114  Uthman ↔ Ruqayyah bint Muhammad
+--  115  Uthman ↔ Umm Kulthum bint Muhammad
+--  116  Ali ↔ Fatimah al-Zahra
+--  117  Abdullah ibn Jafar ↔ Zaynab bint Ali
+--  118  Umar ibn al-Khattab ↔ Umm Kulthum bint Ali
+--  119  Ali ↔ Umamah bint Abi al-As (second marriage)
+--
+-- Next available person UUID: 063
+-- Next available marriage UUID: 120
+-- ═══════════════════════════════════════════════════════════════════════════════

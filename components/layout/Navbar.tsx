@@ -32,6 +32,7 @@ export default function Navbar(): React.ReactElement {
           <NavLink href="/tree" label={t('nav.tree')} />
           <NavLink href="/search" label={t('nav.search')} />
           <NavLink href="/submit" label={t('nav.submit')} />
+          <NavLink href="/map" label={t('nav.map')} />
         </div>
 
         {/* Locale switcher + auth */}

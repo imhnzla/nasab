@@ -4,7 +4,9 @@
 import type { Node, Edge } from '@xyflow/react'
 import type { Database } from '@/lib/supabase/types'
 
+// Extend and override the base Supabase type with missing columns
 export type PersonRow = Database['public']['Tables']['persons']['Row']
+
 export type MarriageRow = Database['public']['Tables']['marriages']['Row']
 
 // SearchHit is the lean shape returned by the tRPC search.fuzzy procedure.
@@ -34,8 +36,10 @@ export const NODE_HEIGHT = 64
 
 export type PersonNodeData = {
   person: PersonRow
-  motherBranch?: Branch | null       // inner border = mother's branch
-  collapsedCount?: number            // set when node is collapsed; undefined = not collapsed
+  motherBranch?: Branch | null
+  collapsedCount?: number
+  highlighted?: boolean
+  dimmed?: boolean
   onToggleCollapse?: (id: string) => void
 }
 

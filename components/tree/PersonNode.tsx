@@ -1,6 +1,6 @@
 'use client'
 // Custom @xyflow/react node
-// Female persons render as ovals; dual-border shows mother's branch; collapse toggle
+// Female persons render as ovals; dual-border shows mother's branch; collapse toggle; highlight/dim for path finder
 
 import React, { memo } from 'react'
 import { Handle, Position } from '@xyflow/react'
@@ -9,9 +9,13 @@ import type { PersonFlowNode } from '@/lib/tree/types'
 import { BRANCH_COLOURS } from '@/lib/tree/types'
 
 function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): React.ReactElement {
-  const { person } = data
+  const { person, highlighted, dimmed } = data
   const branchColour   = person.branch ? BRANCH_COLOURS[person.branch] : '#6B7280'
   const isFemalePerson = person.gender === 'female'
+  const isLiving = person.is_living === true
+
+  // Use locale from document.documentElement.lang
+  const locale = typeof document !== 'undefined' ? document.documentElement.lang : 'en'
 
   return (
     <>
@@ -19,7 +23,7 @@ function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): React.R
 
       <div
         className={[
-          'relative flex h-[64px] w-[180px] flex-col justify-center px-2 shadow-sm border-2',
+          'relative flex h-[64px] w-[180px] flex-col justify-center px-2 shadow-sm border-2 transition-all',
           isFemalePerson ? 'rounded-[50%]' : 'rounded-md',
           selected ? 'ring-2 ring-offset-1' : '',
         ].join(' ')}
@@ -27,6 +31,8 @@ function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): React.R
           borderColor: branchColour,
           background: isFemalePerson ? `${branchColour}12` : '#fff',
           ...(selected ? { outline: `2px solid ${branchColour}` } : {}),
+          ...(highlighted ? { outline: '3px solid #F59E0B', outlineOffset: 2 } : {}),
+          opacity: dimmed ? 0.25 : 1,
         }}
       >
         {/* Inner border — mother's branch colour */}
@@ -37,6 +43,30 @@ function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): React.R
               inset: 3,
               borderRadius: isFemalePerson ? '50%' : 4,
               border: `1.5px solid ${BRANCH_COLOURS[data.motherBranch]}`,
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+
+        {/* Scholarly tradition ring (if present) */}
+        {person.scholarly_tradition && (
+          <div
+            aria-label={`${person.scholarly_tradition} tradition`}
+            title={`${person.scholarly_tradition} tradition`}
+            style={{
+              position: 'absolute',
+              inset: 5,
+              borderRadius: isFemalePerson ? '50%' : 3,
+              border: `1.5px solid ${
+                person.scholarly_tradition === 'sunni'  ? '#15803D'
+                : person.scholarly_tradition === 'shia' ? '#1E3A5F'
+                : 'transparent'
+              }`,
+              // For 'both': gradient border via outline trick
+              ...(person.scholarly_tradition === 'both' ? {
+                background: 'linear-gradient(white, white) padding-box, linear-gradient(90deg, #15803D 50%, #1E3A5F 50%) border-box',
+                border: '1.5px solid transparent',
+              } : {}),
               pointerEvents: 'none',
             }}
           />
@@ -105,22 +135,52 @@ function PersonNodeInner({ data, selected }: NodeProps<PersonFlowNode>): React.R
           </button>
         )}
 
-        {/* Arabic name */}
-        <p
-          dir="rtl"
-          className="truncate text-right text-sm leading-tight font-bold text-gray-900"
-          title={person.name_ar}
-        >
-          {person.name_ar}
-        </p>
+        {/* Photo avatar */}
+        {!isLiving && person.photo_url && (
+          <img
+            src={person.photo_url}
+            alt=""
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: 4,
+              left: isFemalePerson ? 16 : 4,
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              objectFit: 'cover',
+              border: `1.5px solid ${branchColour}`,
+            }}
+          />
+        )}
 
-        {/* English name */}
-        <p
-          className="truncate text-left text-xs leading-tight text-gray-500"
-          title={person.name_en}
-        >
-          {person.name_en}
-        </p>
+        {/* Names — with privacy mask for living persons */}
+        {isLiving ? (
+          <>
+            <p className="truncate text-right text-sm font-bold text-gray-900" style={{ filter: 'blur(4px)', userSelect: 'none' }}>
+              ████████
+            </p>
+            <p className="text-xs text-gray-400 text-center">Living member (private)</p>
+          </>
+        ) : (
+          <>
+            <p
+              dir="rtl"
+              className="truncate text-right text-sm leading-tight font-bold text-gray-900"
+              style={{ paddingLeft: person.photo_url ? 36 : 0 }}
+              title={person.name_ar}
+            >
+              {locale === 'ur' && person.name_ur ? person.name_ur : person.name_ar}
+            </p>
+            <p
+              className="truncate text-left text-xs leading-tight text-gray-500"
+              style={{ paddingLeft: person.photo_url ? 36 : 0 }}
+              title={person.name_en}
+            >
+              {person.name_en}
+            </p>
+          </>
+        )}
       </div>
 
       <Handle type="source" position={Position.Bottom} className="!bg-gray-400" />

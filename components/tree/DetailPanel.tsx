@@ -1,10 +1,12 @@
 'use client'
 // Phase 1 — Slide-in panel showing full biography when a tree node is clicked
+// Phase 2 — Urdu name, suggest edit, bookmarks
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useLocale } from 'next-intl'
 import type { PersonRow, MarriageRow } from '@/lib/tree/types'
 import { BRANCH_COLOURS } from '@/lib/tree/types'
+import { BookmarkStar } from './BookmarkStar'
 
 export type DetailPanelProps = {
   person:    PersonRow | null
@@ -37,6 +39,7 @@ export function DetailPanel({
   onFlyTo,
 }: DetailPanelProps): React.ReactElement | null {
   const locale = useLocale()
+  const [showSuggestForm, setShowSuggestForm] = useState(false)
   if (!person) return null
 
   const branchColour = person.branch ? BRANCH_COLOURS[person.branch] : '#6B7280'
@@ -88,18 +91,24 @@ export function DetailPanel({
         >
           <div className="flex-1 overflow-hidden">
             <h2 dir="rtl" className="text-xl leading-tight font-bold text-gray-900">
-              {person.name_ar}
+              {locale === 'ur' && person.name_ur ? person.name_ur : person.name_ar}
             </h2>
             <p className="mt-0.5 truncate text-sm text-gray-500">{person.name_en}</p>
+            {person.name_ur && locale !== 'ur' && (
+              <p dir="rtl" className="text-xs text-gray-400 mt-1">{person.name_ur}</p>
+            )}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="ms-2 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-            aria-label="Close panel"
-          >
-            ×
-          </button>
+          <div className="flex items-center gap-2">
+            <BookmarkStar personId={person.id} />
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              aria-label="Close panel"
+            >
+              ×
+            </button>
+          </div>
         </div>
 
         {/* Body */}
@@ -263,6 +272,18 @@ export function DetailPanel({
               </ul>
             </div>
           )}
+
+          {/* Suggest edit button */}
+          <div className="border-t border-gray-100 pt-3 mt-2">
+            <button
+              onClick={() => setShowSuggestForm(true)}
+              className="w-full rounded-md border border-gray-300 bg-white py-1.5 text-xs text-gray-600 hover:bg-gray-50"
+            >
+              Suggest edit
+            </button>
+          </div>
+
+          {/* Suggest edit modal would go here */}
         </div>
       </div>
     </div>

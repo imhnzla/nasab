@@ -12,7 +12,8 @@
     "admin": "Admin",
     "login": "Log In",
     "register": "Register",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "map": "Map"
   },
   "tree": {
     "title": "Prophetic Family Tree",
@@ -28,7 +29,23 @@
     "zoom_in": "Zoom in",
     "zoom_out": "Zoom out",
     "reset_view": "Reset view",
-    "no_data": "No data available"
+    "no_data": "No data available",
+    "view_2d": "2D",
+    "view_3d": "3D ↗",
+    "view_radial": "Radial ◎",
+    "view_accessible": "Accessible ♿",
+    "collapse_all": "Collapse all",
+    "expand_all": "Expand all",
+    "show_wives": "Show wives",
+    "generation_jump": "Gen:",
+    "path_finder": "Path finder",
+    "path_find": "Find path",
+    "path_clear": "Clear",
+    "path_steps": "{count} steps",
+    "timeline": "Timeline",
+    "export_png": "Export PNG",
+    "export_pdf": "Export PDF",
+    "export_gedcom": "Export GEDCOM"
   },
   "search": {
     "placeholder": "Search by name in Arabic or English...",
@@ -51,7 +68,14 @@
       "sunni": "Sunni",
       "shia": "Shia",
       "both": "Agreed upon"
-    }
+    },
+    "suggest_edit": "Suggest edit",
+    "bookmark": "Bookmark",
+    "bookmarked": "Bookmarked",
+    "fly_to": "Fly to",
+    "living_private": "Living member (private)",
+    "spouse_of": "Spouse of",
+    "marriages": "Marriages ({count})"
   },
   "submission": {
     "title": "Submit Your Lineage",
@@ -88,5 +112,21 @@
       "title": "Connecting Descendants",
       "desc": "Descendants worldwide can submit their lineage for scholarly review and official documentation."
     }
+  },
+  "admin": {
+    "merge_persons": "Merge duplicates",
+    "bulk_import": "Bulk import",
+    "change_requests": "Change requests",
+    "merge_keep": "Keep this person",
+    "merge_delete": "Merge (delete) this one",
+    "import_persons": "Import {count} persons"
+  },
+  "map": {
+    "title": "Geographic distribution",
+    "subtitle": "Birth locations of verified family members"
+  },
+  "bookmarks": {
+    "title": "Bookmarks",
+    "empty": "No bookmarks yet"
   }
 }

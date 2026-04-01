@@ -12,7 +12,8 @@
     "admin": "الإدارة",
     "login": "تسجيل الدخول",
     "register": "إنشاء حساب",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "map": "الخريطة"
   },
   "tree": {
     "title": "شجرة النسب الشريف",
@@ -28,7 +29,23 @@
     "zoom_in": "تكبير",
     "zoom_out": "تصغير",
     "reset_view": "إعادة ضبط العرض",
-    "no_data": "لا توجد بيانات"
+    "no_data": "لا توجد بيانات",
+    "view_2d": "ثنائي الأبعاد",
+    "view_3d": "ثلاثي الأبعاد ↗",
+    "view_radial": "شعاعي ◎",
+    "view_accessible": "قابل للوصول ♿",
+    "collapse_all": "طي الكل",
+    "expand_all": "توسيع الكل",
+    "show_wives": "إظهار الزوجات",
+    "generation_jump": "الجيل:",
+    "path_finder": "الباحث عن السلسلة",
+    "path_find": "ابحث عن السلسلة",
+    "path_clear": "مسح",
+    "path_steps": "{count} خطوة",
+    "timeline": "الخط الزمني",
+    "export_png": "تصدير PNG",
+    "export_pdf": "تصدير PDF",
+    "export_gedcom": "تصدير GEDCOM"
   },
   "search": {
     "placeholder": "ابحث بالاسم بالعربية أو الإنجليزية...",
@@ -51,7 +68,14 @@
       "sunni": "السنة",
       "shia": "الشيعة",
       "both": "متفق عليه"
-    }
+    },
+    "suggest_edit": "اقترح تعديلاً",
+    "bookmark": "علامة مرجعية",
+    "bookmarked": "تمت الإشارة",
+    "fly_to": "انتقل إلى",
+    "living_private": "شخص حي (خاص)",
+    "spouse_of": "زوج/زوجة",
+    "marriages": "الزيجات ({count})"
   },
   "submission": {
     "title": "أضف نسبك",
@@ -88,5 +112,21 @@
       "title": "ربط الأحفاد",
       "desc": "يستطيع الأحفاد في كل أنحاء العالم تقديم نسبهم للمراجعة والتوثيق الرسمي."
     }
+  },
+  "admin": {
+    "merge_persons": "دمج المكررات",
+    "bulk_import": "استيراد جماعي",
+    "change_requests": "طلبات التعديل",
+    "merge_keep": "احتفظ بهذا الشخص",
+    "merge_delete": "ادمج (احذف) هذا الشخص",
+    "import_persons": "استيراد {count} شخص"
+  },
+  "map": {
+    "title": "التوزيع الجغرافي",
+    "subtitle": "مواقع ميلاد أفراد العائلة الموثَّقين"
+  },
+  "bookmarks": {
+    "title": "العلامات المرجعية",
+    "empty": "لا توجد علامات مرجعية بعد"
   }
 }

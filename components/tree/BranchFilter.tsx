@@ -8,6 +8,8 @@ import { BRANCH_COLOURS } from '@/lib/tree/types'
 export type BranchFilterProps = {
   activeBranches: Branch[]
   onChange: (branches: Branch[]) => void
+  showWives: boolean
+  onShowWivesChange: (v: boolean) => void
 }
 
 type BranchConfig = {
@@ -24,7 +26,7 @@ const BRANCHES: BranchConfig[] = [
 
 const ALL_BRANCHES: Branch[] = ['hasanid', 'husaynid', 'hashemite']
 
-export function BranchFilter({ activeBranches, onChange }: BranchFilterProps): React.ReactElement {
+export function BranchFilter({ activeBranches, onChange, showWives, onShowWivesChange }: BranchFilterProps): React.ReactElement {
   const allActive = ALL_BRANCHES.every((b) => activeBranches.includes(b))
 
   function handleAllToggle(): void {
@@ -91,6 +93,26 @@ export function BranchFilter({ activeBranches, onChange }: BranchFilterProps): R
           </button>
         )
       })}
+
+      {/* Show wives toggle */}
+      <div
+        style={{ borderTop: '1px solid #E5E7EB', marginTop: 12, paddingTop: 12 }}
+        className="w-full"
+      >
+        <label
+          className="flex items-center gap-2 cursor-pointer text-xs text-gray-700 select-none"
+          htmlFor="show-wives-toggle"
+        >
+          <input
+            id="show-wives-toggle"
+            type="checkbox"
+            checked={showWives}
+            onChange={(e) => onShowWivesChange(e.target.checked)}
+            className="rounded border-gray-300"
+          />
+          <span>Wives / الزوجات</span>
+        </label>
+      </div>
     </div>
   )
 }

@@ -45,7 +45,7 @@ export const searchRouter = t.router({
       type SearchPersonsArgs = Database['public']['Functions']['search_persons']['Args']
       const rpcArgs: SearchPersonsArgs = {
         query: normalised,
-        branch_filter: input.branch ?? null,
+        branch_filter: input.branch ?? undefined,
         result_limit: fetchLimit,
       }
       const { data, error } = await ctx.supabase.rpc('search_persons', rpcArgs)
@@ -77,8 +77,8 @@ export const searchRouter = t.router({
           name_ar,
           name_en,
           father_id,
-          branch,
-          scholarly_tradition,
+          branch: branch as SearchHit['branch'],
+          scholarly_tradition: scholarly_tradition as SearchHit['scholarly_tradition'],
           generation,
         })
       )

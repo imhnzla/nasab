@@ -39,7 +39,9 @@ export function PersonNode3D({
 }): React.ReactElement {
   const [hovered, setHovered] = useState(false)
 
-  const isRoot = !person.father_id && (person.generation === 1 || person.generation === null)
+  // isRoot ONLY for the Prophet: must have generation===1 AND no father
+  // (lateral-entry persons also have no father but have generation===null — they render as SpouseNode3D)
+  const isRoot = person.generation === 1 && !person.father_id
   const isDaughter = person.gender === 'female' && !!person.father_id
   const isLiving = (person as { is_living?: boolean }).is_living === true
 
@@ -85,7 +87,7 @@ export function PersonNode3D({
       {/* HTML label */}
       <Html
         center
-        distanceFactor={isRoot ? 700 : 500}
+        distanceFactor={isRoot ? 420 : 300}
         zIndexRange={[0, 15]}
         style={{ opacity, transition: 'opacity 0.3s', pointerEvents: 'none' }}
       >

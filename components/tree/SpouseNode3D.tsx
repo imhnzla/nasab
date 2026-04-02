@@ -21,10 +21,10 @@ export function SpouseNode3D({
   marriageDate,
   onClick,
 }: {
-  person:       PersonRow
-  position:     [number, number, number]
+  person: PersonRow
+  position: [number, number, number]
   marriageDate: string | null
-  onClick:      () => void
+  onClick: () => void
 }): React.ReactElement {
   const [hovered, setHovered] = useState(false)
 
@@ -32,7 +32,10 @@ export function SpouseNode3D({
     <group position={position}>
       {/* Invisible click-target mesh */}
       <mesh
-        onClick={(e) => { e.stopPropagation(); onClick() }}
+        onClick={(e) => {
+          e.stopPropagation()
+          onClick()
+        }}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       >
@@ -41,19 +44,26 @@ export function SpouseNode3D({
       </mesh>
 
       {/* HTML label */}
-      <Html center distanceFactor={480} zIndexRange={[0, 12]} style={{ pointerEvents: 'none' }}>
-        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Html center distanceFactor={300} zIndexRange={[0, 12]} style={{ pointerEvents: 'none' }}>
+        <div
+          style={{
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
           {/* Marriage date tag — floats above the circle */}
           {marriageDate && (
             <span
               style={{
-                position:    'absolute',
-                top:         -18,
-                fontSize:    8,
-                color:       COLOUR.dust,
-                fontFamily:  'monospace',
+                position: 'absolute',
+                top: -18,
+                fontSize: 8,
+                color: COLOUR.dust,
+                fontFamily: 'monospace',
                 letterSpacing: 0.5,
-                whiteSpace:  'nowrap',
+                whiteSpace: 'nowrap',
               }}
             >
               م. {marriageDate}
@@ -63,41 +73,41 @@ export function SpouseNode3D({
           <div
             onClick={onClick}
             style={{
-              width:          W,
-              height:         W,          // circle: equal w/h
-              borderRadius:   '50%',
-              background:     hovered
+              width: W,
+              height: W, // circle: equal w/h
+              borderRadius: '50%',
+              background: hovered
                 ? `radial-gradient(circle at 40% 35%, ${COLOUR.lapisLight}, ${COLOUR.lapis})`
                 : COLOUR.lapis,
-              border:         `1.5px solid ${hovered ? COLOUR.lapisLight : COLOUR.lapis}`,
-              boxShadow:      hovered
+              border: `1.5px solid ${hovered ? COLOUR.lapisLight : COLOUR.lapis}`,
+              boxShadow: hovered
                 ? `0 0 12px ${COLOUR.lapis}90, 0 0 24px ${COLOUR.lapis}40`
                 : `0 0 8px ${COLOUR.lapis}60, 1px 3px 8px rgba(0,0,0,0.3)`,
-              display:        'flex',
-              flexDirection:  'column',
-              alignItems:     'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
               justifyContent: 'center',
-              gap:            2,
-              cursor:         'pointer',
-              pointerEvents:  'all',
-              transition:     'box-shadow 0.2s, background 0.2s',
+              gap: 2,
+              cursor: 'pointer',
+              pointerEvents: 'all',
+              transition: 'box-shadow 0.2s, background 0.2s',
             }}
           >
             <p
               dir="rtl"
               title={person.name_ar}
               style={{
-                margin:      0,
-                color:       COLOUR.parchment,
-                fontSize:    11,
-                fontWeight:  700,
-                lineHeight:  1.2,
-                maxWidth:    W - 12,
-                overflow:    'hidden',
+                margin: 0,
+                color: COLOUR.parchment,
+                fontSize: 11,
+                fontWeight: 700,
+                lineHeight: 1.2,
+                maxWidth: W - 12,
+                overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                whiteSpace:  'nowrap',
-                textAlign:   'center',
-                fontFamily:  'serif',
+                whiteSpace: 'nowrap',
+                textAlign: 'center',
+                fontFamily: 'serif',
               }}
             >
               {person.name_ar}
@@ -105,15 +115,15 @@ export function SpouseNode3D({
             <p
               title={person.name_en}
               style={{
-                margin:      0,
-                color:       `${COLOUR.parchment}90`,
-                fontSize:    9,
-                lineHeight:  1.1,
-                maxWidth:    W - 12,
-                overflow:    'hidden',
+                margin: 0,
+                color: `${COLOUR.parchment}90`,
+                fontSize: 9,
+                lineHeight: 1.1,
+                maxWidth: W - 12,
+                overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                whiteSpace:  'nowrap',
-                textAlign:   'center',
+                whiteSpace: 'nowrap',
+                textAlign: 'center',
               }}
             >
               {person.name_en}

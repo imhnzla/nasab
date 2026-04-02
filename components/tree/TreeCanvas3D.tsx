@@ -60,9 +60,17 @@ function computeShellLayout(
 ): Map<string, [number, number, number]> {
   const posMap = new Map<string, [number, number, number]>()
 
-  // Group by generation
+  // "Lateral entries" — persons who connect to the tree only via marriage, not descent.
+  // Characteristics: father_id === null AND generation === null (e.g. the Prophet's wives,
+  // sons-in-law). They must NOT occupy a generation shell; instead they are positioned
+  // beside their spouse in the wife-placement pass below.
+  const isLateralEntry = (p: PersonRow): boolean =>
+    p.father_id === null && (p.generation === null || p.generation === undefined)
+
+  // Group by generation — skip lateral entries
   const byGen = new Map<number, PersonRow[]>()
   for (const p of persons) {
+    if (isLateralEntry(p)) continue
     const gen = p.generation ?? 1
     if (!byGen.has(gen)) byGen.set(gen, [])
     byGen.get(gen)!.push(p)
@@ -106,15 +114,26 @@ function computeShellLayout(
     }
   }
 
-  // Place wives relative to their husband
+  // Place wives relative to their husband.
+  // Lateral-entry wives are in posMap only if a previous marriage already placed them —
+  // non-lateral wives (who appear as tree nodes) are skipped so their shell position wins.
   const personMap = new Map(persons.map((p) => [p.id, p]))
   for (const m of marriages) {
-    if (posMap.has(m.wife_id)) continue // already placed as a person node
+    const wife = personMap.get(m.wife_id)
+    // Skip non-lateral persons already placed in a generation shell
+    if (posMap.has(m.wife_id) && wife && !isLateralEntry(wife)) continue
+    // Skip if already positioned by a previous marriage entry (polygamy ordering)
+    if (posMap.has(m.wife_id)) continue
     const hPos = posMap.get(m.husband_id)
     if (!hPos) continue
-    const wife = personMap.get(m.wife_id)
     if (!wife) continue
-    posMap.set(m.wife_id, [hPos[0] + 230, hPos[1], hPos[2] + (m.order_num - 1) * 150])
+    // Spread wives: alternate left/right of husband, staggered in Z
+    const side = m.order_num % 2 === 0 ? -1 : 1
+    posMap.set(m.wife_id, [
+      hPos[0] + side * 200,
+      hPos[1],
+      hPos[2] + Math.floor((m.order_num - 1) / 2) * 160,
+    ])
   }
 
   return posMap
@@ -832,13 +851,22 @@ export function TreeCanvas3D({
           )
         })}
 
-        {/* Spouse nodes */}
+        {/* Spouse nodes — render as lapis circles.
+            Lateral-entry wives (father_id=null, generation=null) are in the persons table
+            but connect to the tree only via marriage, so they must render as SpouseNode3D
+            regardless of being present in the persons array. */}
         {showWives &&
           visibleMarriages.map((m) => {
             const wife = personMap.get(m.wife_id)
             const wPos = posMap.get(m.wife_id)
-            // Only render wife as SpouseNode3D if she's not already a person node
-            if (!wife || !wPos || persons.some((p) => p.id === m.wife_id)) return null
+            if (!wife || !wPos) return null
+            // Skip wife if she is a proper tree node (has a generation shell position)
+            const wifePerson = persons.find((p) => p.id === m.wife_id)
+            const isLateral =
+              wifePerson === undefined ||
+              (wifePerson.father_id === null &&
+                (wifePerson.generation === null || wifePerson.generation === undefined))
+            if (!isLateral) return null
             return (
               <SpouseNode3D
                 key={`w-${m.wife_id}`}

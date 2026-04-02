@@ -2,7 +2,8 @@
 // A translucent horizontal slab representing one generation in the 3D view
 
 import React from 'react'
-import { PLANE_WIDTH, PLANE_DEPTH } from '@/lib/tree/constants3d'
+const PLANE_WIDTH = 4000
+const PLANE_DEPTH = 4000
 
 const GEN_COLORS: Record<number, string> = {
   0: '#E1F5EE',

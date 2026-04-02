@@ -1,26 +1,36 @@
 'use client'
-// Quadratic bezier arc connecting husband and wife nodes in 3D space
-// Cross-branch marriages render in pink; same-branch in gray
+/**
+ * MarriageArc3D — marriage bond line
+ *
+ * Spec:
+ * - Dashed double-line, horizontal
+ * - Color: #8B7355 (dust) — warmer, quieter than descent lines
+ * - No arrowhead — it is a bond, not a direction
+ * - Cross-branch marriages: slightly brighter dust tone
+ */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Line } from '@react-three/drei'
-import { ARC_RISE } from '@/lib/tree/constants3d'
+import { COLOUR, LINE_WIDTH_MARRIAGE, MARRIAGE_ARC_RISE } from '@/lib/tree/constants3d'
 
 function bezierPoints(
   from: [number, number, number],
-  to: [number, number, number],
-  segments: number,
+  to:   [number, number, number],
 ): [number, number, number][] {
+  const segments = 24
   const mid: [number, number, number] = [
     (from[0] + to[0]) / 2,
-    Math.min(from[1], to[1]) + ARC_RISE,
-    0,
+    (from[1] + to[1]) / 2 + MARRIAGE_ARC_RISE,
+    (from[2] + to[2]) / 2,
   ]
   return Array.from({ length: segments + 1 }, (_, i) => {
-    const t = i / segments
-    const x = (1 - t) ** 2 * from[0] + 2 * (1 - t) * t * mid[0] + t ** 2 * to[0]
-    const y = (1 - t) ** 2 * from[1] + 2 * (1 - t) * t * mid[1] + t ** 2 * to[1]
-    return [x, y, 0] as [number, number, number]
+    const t  = i / segments
+    const mt = 1 - t
+    return [
+      mt * mt * from[0] + 2 * mt * t * mid[0] + t * t * to[0],
+      mt * mt * from[1] + 2 * mt * t * mid[1] + t * t * to[1],
+      mt * mt * from[2] + 2 * mt * t * mid[2] + t * t * to[2],
+    ] as [number, number, number]
   })
 }
 
@@ -29,28 +39,26 @@ export function MarriageArc3D({
   to,
   crossBranch,
 }: {
-  from: [number, number, number]
-  to: [number, number, number]
+  from:         [number, number, number]
+  to:           [number, number, number]
+  crossBranch:  boolean
   marriageDate: string | null
-  crossBranch: boolean
 }): React.ReactElement {
-  const points = bezierPoints(from, to, 32)
-  const mid = points[16]
-  const color = crossBranch ? '#D4537E' : '#9CA3AF'
+  const points = useMemo(() => bezierPoints(from, to), [from, to])
+
+  // Spec: dust tone; cross-branch slightly brighter
+  const color = crossBranch ? '#A0896A' : COLOUR.dust
 
   return (
-    <>
-      <Line points={points} color={color} lineWidth={2} dashed dashSize={8} gapSize={4} />
-
-      {/* Interlocked ring pair at arc midpoint */}
-      <mesh position={[mid[0] - 6, mid[1], 2]}>
-        <torusGeometry args={[5, 1.2, 8, 24]} />
-        <meshStandardMaterial color={color} />
-      </mesh>
-      <mesh position={[mid[0] + 6, mid[1], 2]}>
-        <torusGeometry args={[5, 1.2, 8, 24]} />
-        <meshStandardMaterial color={color} />
-      </mesh>
-    </>
+    <Line
+      points={points}
+      color={color}
+      lineWidth={LINE_WIDTH_MARRIAGE}
+      dashed
+      dashSize={10}
+      gapSize={6}
+      transparent
+      opacity={0.75}
+    />
   )
 }

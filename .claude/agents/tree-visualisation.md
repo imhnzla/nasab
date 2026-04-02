@@ -63,7 +63,7 @@ app/[locale]/(public)/tree/TreePageClient.tsx ← Client wrapper (ReactFlowProvi
 | `components/tree/DetailPanel.tsx`   | Fixed right-side slide-in panel; uses `useLocale()` for bio language; parses `sources` jsonb                     |
 | `components/tree/SearchOverlay.tsx` | Cmd+K modal; debounced `trpc.search.fuzzy.useQuery`; `prepareForSearch()` for Arabic normalisation               |
 | `components/tree/ExportButton.tsx`  | `toPng(ref, { pixelRatio: 2, cacheBust: true })` from `html-to-image`; loading spinner state                     |
-| `public/workers/layout.worker.ts`   | Web Worker: builds tree from `father_id` graph, custom tidy-tree layout, returns `LayoutNode[]` + `LayoutEdge[]` |
+| `lib/workers/layout.worker.ts`   | Web Worker: builds tree from `father_id` graph, custom tidy-tree layout, returns `LayoutNode[]` + `LayoutEdge[]` |
 | `lib/tree/types.ts`                 | Shared types: `PersonFlowNode`, `FamilyEdge`, `Branch`, `BRANCH_COLOURS`, `NODE_WIDTH/HEIGHT`                    |
 
 ## Shared Types (lib/tree/types.ts)
@@ -93,7 +93,7 @@ export type FamilyEdge = Edge
 
 ## Layout Worker
 
-The worker at `public/workers/layout.worker.ts` implements a custom tidy-tree layout (no D3 — workers can't import from `lib/`):
+The worker at `lib/workers/layout.worker.ts` implements a custom tidy-tree layout (no D3 — workers can't import from `lib/`):
 
 ```ts
 // Worker receives/sends:
@@ -102,7 +102,7 @@ type LayoutWorkerOutput = { nodes: LayoutNode[]; edges: LayoutEdge[] }
 
 // Usage in TreePageClient:
 const worker = new Worker(
-  new URL('/workers/layout.worker.ts', import.meta.url),
+  new URL('/lib/workers/layout.worker.ts', import.meta.url),
   { type: 'module' }
 )
 worker.postMessage({ persons: filtered })

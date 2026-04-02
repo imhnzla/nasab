@@ -92,7 +92,7 @@ export const personsRouter = t.router({
             z.object({
               title: z.string(),
               author: z.string().optional(),
-              url: z.string().url().optional(),
+              url: z.url().optional(),
               type: z.string().optional(),
             })
           )
@@ -139,7 +139,7 @@ export const personsRouter = t.router({
             z.object({
               title: z.string(),
               author: z.string().optional(),
-              url: z.string().url().optional(),
+              url: z.url().optional(),
               type: z.string().optional(),
             })
           )
@@ -166,7 +166,7 @@ export const personsRouter = t.router({
 
   // Merge duplicate persons (admin only)
   merge: adminProcedure
-    .input(z.object({ keepId: z.string().uuid(), mergeId: z.string().uuid() }))
+    .input(z.object({ keepId: z.uuid(), mergeId: z.uuid() }))
     .mutation(async ({ ctx, input }) => {
       const { keepId, mergeId } = input
       // Re-point father_id references
@@ -217,7 +217,8 @@ export const personsRouter = t.router({
         }
         const generation = row.generation ? parseInt(row.generation, 10) : null
         const branch = (row.branch as 'hasanid' | 'husaynid' | 'hashemite') || null
-        const gender = row.gender === 'female' ? 'female' : row.gender === 'male' ? 'male' : 'unknown'
+        const gender =
+          row.gender === 'female' ? 'female' : row.gender === 'male' ? 'male' : 'unknown'
 
         const { data: created, error } = await ctx.supabase
           .from('persons')

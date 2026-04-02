@@ -1,11 +1,19 @@
 'use client'
-// 3D spouse node — flat oval (squashed cylinder) + HTML label
+/**
+ * SpouseNode3D — wife node per design spec
+ * Shape: circle (visually distinct from squircle male nodes)
+ * Fill:  lapis #1B3A6B with inner glow on hover
+ * Text:  parchment colour
+ * Size:  85% of standard node
+ */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { Html } from '@react-three/drei'
-import type { PersonRow, Branch } from '@/lib/tree/types'
-import { BRANCH_COLOURS } from '@/lib/tree/types'
-import { NODE_3D_W, NODE_3D_H } from '@/lib/tree/constants3d'
+import type { PersonRow } from '@/lib/tree/types'
+import { COLOUR, NODE_W, NODE_H, WIFE_SCALE } from '@/lib/tree/constants3d'
+
+const W = NODE_W * WIFE_SCALE
+const H = NODE_H * WIFE_SCALE
 
 export function SpouseNode3D({
   person,
@@ -13,49 +21,104 @@ export function SpouseNode3D({
   marriageDate,
   onClick,
 }: {
-  person: PersonRow
-  position: [number, number, number]
+  person:       PersonRow
+  position:     [number, number, number]
   marriageDate: string | null
-  onClick: () => void
+  onClick:      () => void
 }): React.ReactElement {
-  const colour = person.branch ? BRANCH_COLOURS[person.branch as Branch] : '#D4537E'
-  const scaleZ = NODE_3D_H / NODE_3D_W
+  const [hovered, setHovered] = useState(false)
 
   return (
     <group position={position}>
-      {/* Squashed cylinder = oval */}
-      <mesh onClick={onClick} scale={[1, 1, scaleZ]}>
-        <cylinderGeometry args={[NODE_3D_W / 2, NODE_3D_W / 2, 4, 32]} />
-        <meshStandardMaterial color={colour} transparent opacity={0.75} />
+      {/* Invisible click-target mesh */}
+      <mesh
+        onClick={(e) => { e.stopPropagation(); onClick() }}
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
+      >
+        <sphereGeometry args={[W * 0.38, 16, 16]} />
+        <meshBasicMaterial transparent opacity={0} />
       </mesh>
 
-      <Html center distanceFactor={400} style={{ pointerEvents: 'none' }} zIndexRange={[0, 10]}>
-        <div
-          style={{
-            width: NODE_3D_W - 16,
-            background: `${colour}18`,
-            border: `2px solid ${colour}`,
-            borderRadius: '50%',
-            padding: '6px 12px',
-            fontSize: 11,
-            cursor: 'pointer',
-            pointerEvents: 'all',
-            textAlign: 'center',
-            position: 'relative',
-          }}
-          onClick={onClick}
-        >
+      {/* HTML label */}
+      <Html center distanceFactor={480} zIndexRange={[0, 12]} style={{ pointerEvents: 'none' }}>
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {/* Marriage date tag — floats above the circle */}
           {marriageDate && (
-            <span style={{ position: 'absolute', top: -16, left: 0, right: 0, fontSize: 9, color: colour, textAlign: 'center' }}>
+            <span
+              style={{
+                position:    'absolute',
+                top:         -18,
+                fontSize:    8,
+                color:       COLOUR.dust,
+                fontFamily:  'monospace',
+                letterSpacing: 0.5,
+                whiteSpace:  'nowrap',
+              }}
+            >
               م. {marriageDate}
             </span>
           )}
-          <p dir="rtl" style={{ fontWeight: 700, margin: 0, fontSize: 12, lineHeight: 1.3 }}>
-            {person.name_ar}
-          </p>
-          <p style={{ color: '#6B7280', margin: 0, fontSize: 10, lineHeight: 1.2 }}>
-            {person.name_en}
-          </p>
+
+          <div
+            onClick={onClick}
+            style={{
+              width:          W,
+              height:         W,          // circle: equal w/h
+              borderRadius:   '50%',
+              background:     hovered
+                ? `radial-gradient(circle at 40% 35%, ${COLOUR.lapisLight}, ${COLOUR.lapis})`
+                : COLOUR.lapis,
+              border:         `1.5px solid ${hovered ? COLOUR.lapisLight : COLOUR.lapis}`,
+              boxShadow:      hovered
+                ? `0 0 12px ${COLOUR.lapis}90, 0 0 24px ${COLOUR.lapis}40`
+                : `0 0 8px ${COLOUR.lapis}60, 1px 3px 8px rgba(0,0,0,0.3)`,
+              display:        'flex',
+              flexDirection:  'column',
+              alignItems:     'center',
+              justifyContent: 'center',
+              gap:            2,
+              cursor:         'pointer',
+              pointerEvents:  'all',
+              transition:     'box-shadow 0.2s, background 0.2s',
+            }}
+          >
+            <p
+              dir="rtl"
+              title={person.name_ar}
+              style={{
+                margin:      0,
+                color:       COLOUR.parchment,
+                fontSize:    11,
+                fontWeight:  700,
+                lineHeight:  1.2,
+                maxWidth:    W - 12,
+                overflow:    'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace:  'nowrap',
+                textAlign:   'center',
+                fontFamily:  'serif',
+              }}
+            >
+              {person.name_ar}
+            </p>
+            <p
+              title={person.name_en}
+              style={{
+                margin:      0,
+                color:       `${COLOUR.parchment}90`,
+                fontSize:    9,
+                lineHeight:  1.1,
+                maxWidth:    W - 12,
+                overflow:    'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace:  'nowrap',
+                textAlign:   'center',
+              }}
+            >
+              {person.name_en}
+            </p>
+          </div>
         </div>
       </Html>
     </group>

@@ -15,7 +15,7 @@ export const bookmarksRouter = t.router({
   }),
 
   toggle: authedProcedure
-    .input(z.object({ person_id: z.string().uuid(), label: z.string().optional() }))
+    .input(z.object({ person_id: z.uuid(), label: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
       const { data: existing } = await ctx.supabase
         .from('bookmarks')

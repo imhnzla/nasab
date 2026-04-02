@@ -24,6 +24,9 @@ server/trpc/
     users.ts         -- Profile management (Phase 3)
     admin.ts         -- Admin-only operations (Phase 4)
     search.ts        -- fuzzy (calls search_persons RPC via pg_trgm)
+    marriages.ts     -- byPerson, listAll, create (admin)
+    bookmarks.ts     -- list, toggle (authed)
+    changeRequests.ts -- create (authed), list (admin), review (admin)
   context.ts         -- Supabase session injection (ctx.supabase available in all procedures)
   middleware.ts      -- Auth + role guards
   root.ts            -- App router combining all routers (imports t from init.ts)

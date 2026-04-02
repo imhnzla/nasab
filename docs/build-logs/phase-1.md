@@ -152,3 +152,27 @@ Even with the above fixes, returning `PersonRow[]` from the tRPC search procedur
 | `app/[locale]/(public)/tree/TreePageClient.tsx` | `SearchHit` imported; `handleSearchSelect` resolves full `PersonRow` from `persons` prop via `hit.id` |
 
 **Result:** `npx tsc --noEmit` → 0 errors. `npm run build` → clean, all 24 routes built.
+
+---
+
+### 2026-04-02 — Consistency Check + Codebase Fixes
+
+Ran `/consistency-check` and `/self-update`. Findings and fixes:
+
+**Zod v4 deprecated patterns fixed (8 occurrences across 4 files):**
+
+| File | Pattern fixed |
+|------|--------------|
+| `server/trpc/routers/bookmarks.ts` | `z.string().uuid()` → `z.uuid()` |
+| `server/trpc/routers/changeRequests.ts` | `z.string().uuid()` × 2 → `z.uuid()` |
+| `server/trpc/routers/marriage.ts` | `z.string().uuid()` × 3 → `z.uuid()` |
+| `server/trpc/routers/persons.ts` | `z.string().uuid()` × 2, `z.string().url()` × 2 → top-level forms |
+
+**CLAUDE.md updated:**
+- Worker path corrected: `public/workers/layout.worker.ts` → `lib/workers/layout.worker.ts`
+- Added missing routers to folder structure: `marriages`, `bookmarks`, `changeRequests`
+- Phase statuses updated to reflect actual codebase state (Phases 1–5 partially or fully scaffolded)
+
+**Agent files updated:**
+- `tree-visualisation.md`: worker path updated to `lib/workers/`
+- `api-trpc.md`: new routers (marriages, bookmarks, changeRequests) added to router structure

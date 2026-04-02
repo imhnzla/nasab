@@ -83,18 +83,21 @@ lib/
   trpc/provider.tsx                # TRPCProvider + QueryClientProvider wrapper
   ocr/vision.ts                    # Google Cloud Vision (Phase 2)
   ocr/parser.ts                    # Urdu shajra text parser (Phase 2)
-public/
+lib/
   workers/layout.worker.ts         # Web Worker: father_id graph → positioned nodes + edges (Phase 1)
 server/trpc/
   init.ts                          # initTRPC instance (imported by routers to avoid circular deps)
   root.ts                          # App router (imports from init.ts + all routers)
   context.ts                       # Supabase session injection
   middleware.ts                    # authedProcedure, verifierProcedure, adminProcedure
-  routers/persons.ts               # list, byId, create, update
+  routers/persons.ts               # list, byId, create, update, merge, bulkImport
   routers/submissions.ts           # create, mySubmissions, updateStatus
   routers/users.ts                 # me, updateProfile, updateRole
   routers/admin.ts                 # allSubmissions, auditLog, ocrJobs
   routers/search.ts                # fuzzy
+  routers/marriages.ts             # byPerson, listAll, create
+  routers/bookmarks.ts             # list, toggle
+  routers/changeRequests.ts        # create, list, review
 proxy.ts                           # i18n routing + Supabase session refresh
 messages/ar.json                   # Arabic translations (canonical — write first)
 messages/en.json                   # English translations (mirrors ar.json)
@@ -243,12 +246,12 @@ Run `/self-update` at any time to trigger a manual review.
 | Phase | Goal                                                 | Status                                             |
 | ----- | ---------------------------------------------------- | -------------------------------------------------- |
 | 0     | Foundation (Supabase, Next.js, i18n, Vercel)         | Complete (migrations applied, Vercel project live) |
-| 1     | Tree MVP (interactive visualisation)                 | Code complete — apply migrations + seed to finish  |
-| 2     | Urdu PDF Import (OCR pipeline)                       | Not started                                        |
-| 3     | User Accounts (auth, dashboard, submission form)     | Not started                                        |
-| 4     | Verification System (verifier review, approval flow) | Not started                                        |
-| 5     | Public API (REST v1, rate limiting, docs)            | Not started                                        |
-| 6     | Institutional Partnerships                           | Not started                                        |
-| 7     | Scale & Polish (Urdu/Persian, mobile app)            | Not started                                        |
+| 1     | Tree MVP (interactive visualisation)                 | Complete (2D, 3D, radial, bookmarks, marriages, path finder, GEDCOM export) |
+| 2     | Urdu PDF Import (OCR pipeline)                       | In progress (lib/ocr/vision.ts + parser.ts scaffolded)                      |
+| 3     | User Accounts (auth, dashboard, submission form)     | Scaffolded (pages exist; auth wiring pending)                               |
+| 4     | Verification System (verifier review, approval flow) | Scaffolded (admin pages exist; workflow logic pending)                      |
+| 5     | Public API (REST v1, rate limiting, docs)            | Scaffolded (routes exist; rate limiting wired)                              |
+| 6     | Institutional Partnerships                           | Not started                                                                 |
+| 7     | Scale & Polish (Urdu/Persian, mobile app)            | Not started                                                                 |
 
-Next: `/scaffold-phase 2` to begin the Urdu PDF digitisation pipeline.
+Next: Complete Phase 2 OCR pipeline, then wire Phase 3 auth flows.

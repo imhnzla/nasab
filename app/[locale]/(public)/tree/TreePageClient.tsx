@@ -7,8 +7,15 @@ import { useReactFlow, ReactFlowProvider } from '@xyflow/react'
 import dynamic from 'next/dynamic'
 import '@xyflow/react/dist/style.css'
 
-import type { AnyFlowNode, PersonRow, Branch, FamilyEdge, SearchHit, MarriageRow } from '@/lib/tree/types'
-import type { LayoutNode, LayoutWorkerOutput } from '@/lib/workers/layout.worker'
+import type {
+  AnyFlowNode,
+  PersonRow,
+  Branch,
+  FamilyEdge,
+  SearchHit,
+  MarriageRow,
+} from '@/lib/tree/types'
+import type { LayoutWorkerOutput, LayoutNode } from '@/lib/workers/layout.worker'
 import { TreeCanvas } from '@/components/tree/TreeCanvas'
 import { BranchFilter } from '@/components/tree/BranchFilter'
 import { DetailPanel } from '@/components/tree/DetailPanel'
@@ -25,17 +32,17 @@ const TreeCanvas3D = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-full w-full flex items-center justify-center bg-gray-50">
-        <span className="text-sm text-gray-400 animate-pulse">Loading 3D view…</span>
+      <div className="flex h-full w-full items-center justify-center bg-gray-50">
+        <span className="animate-pulse text-sm text-gray-400">Loading 3D view…</span>
       </div>
     ),
-  },
+  }
 )
 
 // Dynamically import the radial canvas
 const TreeCanvasRadial = dynamic(
   () => import('@/components/tree/TreeCanvasRadial').then((m) => ({ default: m.TreeCanvasRadial })),
-  { ssr: false, loading: () => <div className="h-full w-full bg-gray-50" /> },
+  { ssr: false, loading: () => <div className="h-full w-full bg-gray-50" /> }
 )
 
 type TreePageClientInnerProps = {
@@ -66,7 +73,7 @@ function buildChildrenMap(edges: FamilyEdge[]): Map<string, Set<string>> {
 
 function getHiddenIds(
   collapsedIds: Set<string>,
-  childrenOf: Map<string, Set<string>>,
+  childrenOf: Map<string, Set<string>>
 ): Set<string> {
   const hidden = new Set<string>()
   const queue = [...collapsedIds]
@@ -82,10 +89,7 @@ function getHiddenIds(
   return hidden
 }
 
-function countDescendants(
-  id: string,
-  childrenOf: Map<string, Set<string>>,
-): number {
+function countDescendants(id: string, childrenOf: Map<string, Set<string>>): number {
   let count = 0
   const queue = [id]
   while (queue.length > 0) {
@@ -108,7 +112,7 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
   const [selectedPerson, setSelectedPerson] = useState<PersonRow | null>(null)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [showWives, setShowWives] = useState(true)
-  const [viewMode, setViewMode] = useState<'2d' | '3d' | 'radial' | 'accessible'>('2d')
+  const [viewMode, setViewMode] = useState<'2d' | '3d' | 'radial' | 'accessible'>('3d')
   const [showTimeline, setShowTimeline] = useState(false)
   const [pathHighlightIds, setPathHighlightIds] = useState<Set<string>>(new Set())
   const [scrollY, setScrollY] = useState(0)
@@ -223,7 +227,7 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
   // Generation jump
   const maxGeneration = useMemo(
     () => Math.max(...persons.map((p) => p.generation ?? 0), 0),
-    [persons],
+    [persons]
   )
 
   function jumpToGeneration(gen: number): void {
@@ -234,16 +238,14 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
     })
     if (genNodes.length === 0) return
     const avgX = genNodes.reduce((s, n) => s + n.position.x, 0) / genNodes.length
-    const y    = genNodes[0].position.y
+    const y = genNodes[0].position.y
     setCenter(avgX, y + 32, { zoom: 1.0, duration: 500 })
   }
 
   // Combined memo: filter by showWives + inject collapse callbacks + hide collapsed subtrees
   const { displayNodes, displayEdges } = useMemo(() => {
     // Step 1: filter spouses when showWives is off
-    let filteredNodes: AnyFlowNode[] = showWives
-      ? nodes
-      : nodes.filter((n) => n.type === 'person')
+    let filteredNodes: AnyFlowNode[] = showWives ? nodes : nodes.filter((n) => n.type === 'person')
 
     let filteredEdges: FamilyEdge[] = showWives
       ? edges
@@ -262,9 +264,7 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
         data: {
           ...n.data,
           onToggleCollapse: toggleCollapse,
-          collapsedCount: isCollapsed
-            ? countDescendants(n.id, childrenOf)
-            : undefined,
+          collapsedCount: isCollapsed ? countDescendants(n.id, childrenOf) : undefined,
           highlighted: isHighlighted,
           dimmed: isDimmed,
         },
@@ -275,9 +275,7 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
     if (collapsedIds.size > 0) {
       const hidden = getHiddenIds(collapsedIds, childrenOf)
       filteredNodes = filteredNodes.filter((n) => !hidden.has(n.id))
-      filteredEdges = filteredEdges.filter(
-        (e) => !hidden.has(e.source) && !hidden.has(e.target),
-      )
+      filteredEdges = filteredEdges.filter((e) => !hidden.has(e.source) && !hidden.has(e.target))
     }
 
     return { displayNodes: filteredNodes, displayEdges: filteredEdges }
@@ -305,18 +303,35 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
     return () => container.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Cycle view modes: 2D → Radial → 3D → Accessible → back to 2D
+  // Cycle view modes: 2D → Radial → Accessible → back to 2D
+  // (3D has a dedicated entry button and is excluded from the cycle)
   const cycleViewMode = useCallback(() => {
     setViewMode((prev) => {
       switch (prev) {
-        case '2d': return 'radial'
-        case 'radial': return '3d'
-        case '3d': return 'accessible'
-        default: return '2d'
+        case '2d':
+          return 'radial'
+        case 'radial':
+          return 'accessible'
+        default:
+          return '2d'
       }
     })
   }, [])
 
+  // ── 3D mode: full-page immersive — no sidebar/toolbar ──────────────────────
+  if (viewMode === '3d') {
+    return (
+      <div className="h-screen w-full">
+        <TreeCanvas3D
+          persons={persons}
+          marriages={marriages}
+          onSwitchTo2D={() => setViewMode('2d')}
+        />
+      </div>
+    )
+  }
+
+  // ── Classic 2D / Radial / Accessible modes ────────────────────────────────
   return (
     <div className="relative flex h-screen w-full flex-col overflow-hidden bg-gray-50">
       {/* Toolbar */}
@@ -358,7 +373,7 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
 
           {/* Generation jump */}
           <div className="flex items-center gap-1">
-            <label htmlFor="gen-jump" className="text-xs text-gray-500 whitespace-nowrap">
+            <label htmlFor="gen-jump" className="text-xs whitespace-nowrap text-gray-500">
               Gen:
             </label>
             <input
@@ -369,7 +384,8 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
               className="w-14 rounded border border-gray-300 px-2 py-1 text-xs"
               placeholder="1"
               onKeyDown={(e) => {
-                if (e.key === 'Enter') jumpToGeneration(Number((e.target as HTMLInputElement).value))
+                if (e.key === 'Enter')
+                  jumpToGeneration(Number((e.target as HTMLInputElement).value))
               }}
               onChange={(e) => {
                 const v = Number(e.target.value)
@@ -378,7 +394,17 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
             />
           </div>
 
-          {/* View mode cycle button */}
+          {/* Enter 3D immersive mode */}
+          <button
+            type="button"
+            onClick={() => setViewMode('3d')}
+            className="flex items-center gap-1.5 rounded-md border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-100"
+            aria-label="Enter immersive 3D view"
+          >
+            ✦ 3D
+          </button>
+
+          {/* View mode cycle button (2D / Radial / Accessible) */}
           <button
             type="button"
             onClick={cycleViewMode}
@@ -386,7 +412,6 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
             aria-label={`Current view: ${viewMode}. Click to change.`}
           >
             {viewMode === '2d' && '2D'}
-            {viewMode === '3d' && '3D ↗'}
             {viewMode === 'radial' && 'Radial ◎'}
             {viewMode === 'accessible' && 'Accessible ♿'}
           </button>
@@ -396,7 +421,9 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
             type="button"
             onClick={() => setShowTimeline((v) => !v)}
             className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs ${
-              showTimeline ? 'bg-gray-100 border-gray-400 text-gray-700' : 'border-gray-300 bg-white text-gray-600'
+              showTimeline
+                ? 'border-gray-400 bg-gray-100 text-gray-700'
+                : 'border-gray-300 bg-white text-gray-600'
             } hover:bg-gray-50`}
           >
             Timeline
@@ -469,11 +496,7 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
         <main className="relative flex-1 overflow-hidden" ref={treeContainerRef}>
           {viewMode === '2d' && (
             <div className="relative h-full w-full">
-              <TreeCanvas
-                nodes={displayNodes}
-                edges={displayEdges}
-                onNodeClick={handleNodeClick}
-              />
+              <TreeCanvas nodes={displayNodes} edges={displayEdges} onNodeClick={handleNodeClick} />
               {showTimeline && (
                 <TimelineAxis
                   persons={persons}
@@ -483,14 +506,6 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
                 />
               )}
             </div>
-          )}
-          {viewMode === '3d' && (
-            <TreeCanvas3D
-              persons={persons}
-              marriages={marriages}
-              nodes={nodes as LayoutNode[]} // LayoutNode matches what the worker returns; safe cast
-              onNodeClick={handleNodeClick}
-            />
           )}
           {viewMode === 'radial' && (
             <TreeCanvasRadial persons={persons} onNodeClick={handleNodeClick} />
@@ -520,7 +535,10 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
   )
 }
 
-export function TreePageClient({ persons, marriages }: TreePageClientInnerProps): React.ReactElement {
+export function TreePageClient({
+  persons,
+  marriages,
+}: TreePageClientInnerProps): React.ReactElement {
   return (
     <ReactFlowProvider>
       <TreePageClientInner persons={persons} marriages={marriages} />

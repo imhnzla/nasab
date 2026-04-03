@@ -85,6 +85,56 @@ All other layers clean: versions consistent, all file paths valid, no deprecated
 
 ---
 
+### 2026-04-03 — 3D Fix Attempt → Premium 2D Pivot
+
+**Context:** The 3D tree (`TreeCanvas3D.tsx` using `@react-three/drei <Html>`) was rendering multiple Prophet nodes, no wives/daughters, and unreadable white pill shapes at any meaningful scale. Root causes identified:
+
+- `isRoot` matched `generation === null` — fixed to `generation === 1 && !father_id` strictly
+- `SpouseNode3D` was never rendered because `isLateralEntry` check was missing
+- `@react-three/drei <Html>` creates live DOM nodes per card — fundamentally broken at 50+ generation scale (z-ordering, depth sorting, live DOM overhead)
+
+After analysis, **decision made to abandon 3D and build a premium 2D layout instead.** New branch `premium-2d` created from `3D` (not `main`).
+
+---
+
+### 2026-04-03 — Premium 2D: Phase 1 — Layout Engine + Node Shells
+
+**New files created:**
+
+| File | Purpose |
+|------|---------|
+| `lib/tree/constants2d.ts` | Full design token system: colour palette (Illuminated Manuscript theme), layout geometry, node sizes, LOD breakpoints, edge colours |
+| `components/tree/PersonNodeCard.tsx` | LOD-aware person card (dot/compact/full/inspect), Prophet octagon, daughter emerald accent, collapse toggle, tradition strip |
+| `components/tree/WifeNodeCard.tsx` | Lapis blue wife card, hidden at ultra-far zoom, marriage date display |
+| `components/tree/PremiumEdges.tsx` | Four custom edge types: ParentChildEdge, FatherToWifeEdge, WifeToChildEdge, MarriageArcEdge |
+
+**Files rewritten:**
+
+| File | Changes |
+|------|---------|
+| `lib/workers/layout.worker.ts` | Full rewrite: Modified Reingold-Tilford with wife grouping; `isLateralEntry` detection; `childrenByMother` grouping; bottom-up `subtreeWidth` / top-down `assignPositions`; multi-root side-by-side layout |
+| `components/tree/TreeCanvas.tsx` | New node/edge type maps; dark void theme; SVG dot grid overlay; branch-coloured MiniMap; `fitView` on layout change |
+| `lib/tree/types.ts` | Added `WifeNodeData`, `WifeFlowNode`; `AnyFlowNode` union extended; `LayoutNode.type` includes `'wife'`; `BRANCH_COLOURS` updated to premium palette |
+| `app/[locale]/(public)/tree/TreePageClient.tsx` | Full UI overhaul: dark manuscript header (TopBar), GenerationRail, Wives/Daughters toggles, view mode switcher (2D/Radial/Accessible); `LayoutNode` imported from worker (not types.ts) to avoid dual-definition conflict |
+
+**Design decisions:**
+
+| Decision | Rationale |
+|----------|-----------|
+| Wife nodes inline between father and children (Option A) | Clearest visual grouping of maternal lineages |
+| Patrilineal placement for cross-branch daughters + marriage arc (Option B) | Prevents non-patrilineal contamination of branch subtrees |
+| LOD via `useStore(s=>s.transform[2])` inside each node | Reactive zoom, no prop drilling, self-managing nodes |
+| `LayoutNode` imported from worker file in TreePageClient | Worker uses `data: Record<string,unknown>` (structured-clone safe); types.ts uses typed union — importing from worker avoids TS conflict |
+| Bare `NodeProps` with internal cast in node components | `NodeProps<T>` generic violates `@xyflow/react` v12 `Node<Record<string,unknown>>` constraint |
+| `isLateralEntry`: `generation === null` AND no father in dataset | Wives/in-laws connect only via marriage; excluding them from generation shells prevents misplacement |
+
+**3D components removed from `premium-2d` branch:**
+- `TreeCanvas3D.tsx`, `PersonNode3D.tsx`, `SpouseNode3D.tsx`, `ParentChildLine3D.tsx`, `MarriageArc3D.tsx`, `DetailPanel3D.tsx`, `GenerationPlane.tsx`
+
+**Commits:** `premium-2d` branch — all phases pushed to `origin/premium-2d`
+
+---
+
 ## Checklist
 
 - [x] React Flow + D3.js installed and configured

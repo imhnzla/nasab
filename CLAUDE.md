@@ -62,8 +62,8 @@ app/api/
   v1/branches/route.ts
   v1/submissions/route.ts
 components/
-  tree/                            # TreeCanvas, PersonNode, EdgeRenderer, BranchFilter,
-                                   # DetailPanel, SearchOverlay, ExportButton
+  tree/                            # TreeCanvas, PersonNodeCard, WifeNodeCard, PremiumEdges,
+                                   # BranchFilter, DetailPanel, SearchOverlay, ExportButton
   ui/                              # shadcn/ui components
   forms/                           # SubmissionForm, LoginForm, RegisterForm
   admin/                           # SubmissionQueue, SubmissionDetail, PDFViewer,
@@ -78,7 +78,8 @@ lib/
   i18n/config.ts                   # re-exports routing for backwards compat
   i18n/hijri.ts                    # Hijri ↔ Gregorian conversion
   i18n/arabic.ts                   # normaliseArabic, stripDiacritics, prepareForSearch
-  tree/types.ts                    # Shared types: PersonFlowNode, FamilyEdge, Branch, BRANCH_COLOURS
+  tree/types.ts                    # Shared types: PersonFlowNode, WifeFlowNode, FamilyEdge, Branch, BRANCH_COLOURS
+  tree/constants2d.ts              # Premium 2D design tokens: colours, layout geometry, LOD breakpoints
   trpc/client.ts                   # createTRPCReact<AppRouter>() browser client
   trpc/provider.tsx                # TRPCProvider + QueryClientProvider wrapper
   ocr/vision.ts                    # Google Cloud Vision (Phase 2)
@@ -95,7 +96,7 @@ server/trpc/
   routers/users.ts                 # me, updateProfile, updateRole
   routers/admin.ts                 # allSubmissions, auditLog, ocrJobs
   routers/search.ts                # fuzzy
-  routers/marriages.ts             # byPerson, listAll, create
+  routers/marriage.ts              # byPerson, listAll, create
   routers/bookmarks.ts             # list, toggle
   routers/changeRequests.ts        # create, list, review
 proxy.ts                           # i18n routing + Supabase session refresh

@@ -8,39 +8,28 @@
  */
 
 import React, { useCallback, useEffect, useMemo } from 'react'
-import {
-  ReactFlow,
-  MiniMap,
-  useNodesState,
-  useEdgesState,
-  useReactFlow,
-} from '@xyflow/react'
+import { ReactFlow, MiniMap, useNodesState, useEdgesState, useReactFlow } from '@xyflow/react'
 import type { NodeTypes, EdgeTypes, NodeMouseHandler } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
 import type { AnyFlowNode, FamilyEdge } from '@/lib/tree/types'
-import { PersonNodeCard }  from './PersonNodeCard'
-import { WifeNodeCard }    from './WifeNodeCard'
-import {
-  ParentChildEdge,
-  FatherToWifeEdge,
-  WifeToChildEdge,
-  MarriageArcEdge,
-} from './PremiumEdges'
+import { PersonNodeCard } from './PersonNodeCard'
+import { WifeNodeCard } from './WifeNodeCard'
+import { ParentChildEdge, FatherToWifeEdge, WifeToChildEdge, MarriageArcEdge } from './PremiumEdges'
 import { COLOUR, BRANCH_BORDER } from '@/lib/tree/constants2d'
 
 // ─── Node and edge type maps ───────────────────────────────────────────────────
 
 const nodeTypes: NodeTypes = {
   person: PersonNodeCard as NodeTypes[string],
-  wife:   WifeNodeCard   as NodeTypes[string],
+  wife: WifeNodeCard as NodeTypes[string],
 }
 
 const edgeTypes: EdgeTypes = {
-  parentChild:  ParentChildEdge,
+  parentChild: ParentChildEdge,
   fatherToWife: FatherToWifeEdge,
-  wifeToChild:  WifeToChildEdge,
-  marriageArc:  MarriageArcEdge,
+  wifeToChild: WifeToChildEdge,
+  marriageArc: MarriageArcEdge,
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -55,7 +44,7 @@ export type TreeCanvasProps = {
 
 function minimapNodeColor(node: { data: unknown }): string {
   const branch = (node.data as { person?: { branch?: string } })?.person?.branch
-  if (branch === 'hasanid')  return BRANCH_BORDER.hasanid
+  if (branch === 'hasanid') return BRANCH_BORDER.hasanid
   if (branch === 'husaynid') return BRANCH_BORDER.husaynid
   if (branch === 'hashemite') return BRANCH_BORDER.hashemite
   return COLOUR.lapis // wife nodes
@@ -81,11 +70,24 @@ export function TreeCanvas({
     setEdges(initialEdges)
   }, [initialEdges, setEdges])
 
-  // Re-fit when layout changes (first load or branch filter change)
+  // Re-fit when layout changes — zoom to Gen 1–4 on load so the Prophet and
+  // his immediate family are clearly visible, not the full tree at tiny scale.
   useEffect(() => {
     if (initialNodes.length === 0) return
     const timer = setTimeout(() => {
-      fitView({ padding: 0.15, duration: 600 })
+      const earlyGenNodes = initialNodes
+        .filter((n) => {
+          const g = (n.data as { person?: { generation?: number | null } })?.person?.generation
+          return g != null && g <= 4
+        })
+        .map((n) => ({ id: n.id }))
+
+      fitView({
+        nodes: earlyGenNodes.length > 0 ? earlyGenNodes : undefined,
+        padding: 0.2,
+        duration: 600,
+        maxZoom: 0.9,
+      })
     }, 80)
     return () => clearTimeout(timer)
   }, [initialNodes, fitView])
@@ -103,10 +105,7 @@ export function TreeCanvas({
   const proOptions = useMemo(() => ({ hideAttribution: false }), [])
 
   return (
-    <div
-      className="h-full w-full"
-      style={{ background: COLOUR.void }}
-    >
+    <div className="h-full w-full" style={{ background: COLOUR.void }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -137,7 +136,14 @@ export function TreeCanvas({
           }}
         >
           <defs>
-            <pattern id="nasab-grid" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+            <pattern
+              id="nasab-grid"
+              x="0"
+              y="0"
+              width="32"
+              height="32"
+              patternUnits="userSpaceOnUse"
+            >
               <circle cx="1" cy="1" r="0.8" fill={`${COLOUR.dust}18`} />
             </pattern>
           </defs>

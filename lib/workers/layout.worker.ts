@@ -79,15 +79,15 @@ export type LayoutWorkerOutput = {
 }
 
 // ─── Layout constants (must mirror lib/tree/constants2d.ts) ──────────────────
-const NODE_W        = 160
-const NODE_H        = 96
-const WIFE_W        = 120
-const LANE_HEIGHT   = 240
+const NODE_W = 160
+const NODE_H = 96
+const WIFE_W = 120
+const LANE_HEIGHT = 240
 const WIFE_ROW_OFFSET = 110
-const H_GAP         = 24
-const WIFE_H_GAP    = 12
-const GROUP_GAP     = 44
-const ROOT_GAP      = 200
+const H_GAP = 24
+const WIFE_H_GAP = 12
+const GROUP_GAP = 44
+const ROOT_GAP = 200
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -165,15 +165,27 @@ self.onmessage = (event: MessageEvent<LayoutWorkerInput>): void => {
 
   // ── Step 3: Find all patrilineal roots ────────────────────────────────────
   // A root is a tree person with no father in the dataset.
-  // Multiple roots are laid out side-by-side (e.g. Prophet + Ali ibn Abi Talib).
-  const roots = treePersons.filter(
-    (p) => !(p.father_id && personMap.has(p.father_id))
+  //
+  // We split roots into two groups:
+  //   mainRoots    — roots that HAVE children → laid out as the primary tree
+  //   satelliteRoots — roots with NO children in the dataset (e.g. Ali ibn Abi
+  //                    Talib whose children Hasan/Husayn have father_id=Fatimah).
+  //                    These are placed adjacent to their spouse after main layout
+  //                    rather than as separate subtrees, avoiding a massive spanning arc.
+
+  const allRoots = treePersons.filter((p) => !(p.father_id && personMap.has(p.father_id)))
+
+  const roots = allRoots.filter((p) => (childrenOf.get(p.id) ?? []).length > 0)
+  const satelliteRoots = allRoots.filter((p) => (childrenOf.get(p.id) ?? []).length === 0)
+
+  // Sort main roots by generation (ascending), then name for stability
+  roots.sort(
+    (a, b) => (a.generation ?? 1) - (b.generation ?? 1) || a.name_en.localeCompare(b.name_en)
   )
 
-  // Sort roots by generation (ascending), then name for stability
-  roots.sort((a, b) => (a.generation ?? 1) - (b.generation ?? 1) || a.name_en.localeCompare(b.name_en))
-
   for (const root of roots) buildChildGroups(root.id)
+  // Build child groups for satellites too (so edge emission is correct)
+  for (const sat of satelliteRoots) buildChildGroups(sat.id)
 
   // ── Step 4: Compute subtree widths (bottom-up) ────────────────────────────
   const widthCache = new Map<string, number>()
@@ -186,34 +198,34 @@ self.onmessage = (event: MessageEvent<LayoutWorkerInput>): void => {
     const wives = wivesOf.get(personId) ?? []
     const byMother = childrenByMother.get(personId)
 
+    // Childless wives do NOT inflate horizontal width — they are placed to the
+    // right of the person node post-layout so they never push the subtree centre off.
+    const wivesWithKids = wives.filter((m) => (byMother?.get(m.wife_id) ?? []).length > 0)
+
     if (children.length === 0) {
-      // No children: width = max(own card, wife card row)
-      const wifeRowW =
-        wives.length > 0
-          ? wives.length * (WIFE_W + WIFE_H_GAP) - WIFE_H_GAP
-          : 0
-      const w = Math.max(NODE_W + H_GAP, wifeRowW + H_GAP)
+      // No children: just own card width (childless wives placed beside node)
+      const w = NODE_W + H_GAP
       widthCache.set(personId, w)
       return w
     }
 
     let totalW = 0
 
-    // Width for each wife's sibling group
-    for (let i = 0; i < wives.length; i++) {
-      const m = wives[i]
+    // Width comes only from wives who have children
+    for (let i = 0; i < wivesWithKids.length; i++) {
+      const m = wivesWithKids[i]
       const groupChildren = byMother?.get(m.wife_id) ?? []
       const childGroupW = groupChildren.reduce((s, c) => s + subtreeWidth(c), 0)
       const groupW = Math.max(WIFE_W + WIFE_H_GAP, childGroupW)
       totalW += groupW
-      if (i < wives.length - 1) totalW += GROUP_GAP
+      if (i < wivesWithKids.length - 1) totalW += GROUP_GAP
     }
 
     // Width for unknown-mother children
     const unknownChildren = byMother?.get(null) ?? []
     const unknownW = unknownChildren.reduce((s, c) => s + subtreeWidth(c), 0)
     if (unknownW > 0) {
-      if (wives.length > 0) totalW += GROUP_GAP
+      if (wivesWithKids.length > 0) totalW += GROUP_GAP
       totalW += unknownW
     }
 
@@ -236,31 +248,44 @@ self.onmessage = (event: MessageEvent<LayoutWorkerInput>): void => {
     const wives = wivesOf.get(personId) ?? []
     const byMother = childrenByMother.get(personId)
 
+    // Split wives into those with / without children — same logic as subtreeWidth
+    const wivesWithKids = wives.filter((m) => (byMother?.get(m.wife_id) ?? []).length > 0)
+    const wivesNoKids = wives.filter((m) => (byMother?.get(m.wife_id) ?? []).length === 0)
+
     // Person card: top-left = (centreX - NODE_W/2, (gen-1)*LANE_HEIGHT)
     const centreX = leftBound + totalW / 2
     const personX = centreX - NODE_W / 2
     const personY = (gen - 1) * LANE_HEIGHT
     positions.set(personId, { x: personX, y: personY })
 
-    if (children.length === 0 && wives.length === 0) return
-
-    // If this person has wives but no children, still place wife cards
-    if (children.length === 0 && wives.length > 0) {
-      const wifeRowTotalW = wives.length * (WIFE_W + WIFE_H_GAP) - WIFE_H_GAP
-      let wx = centreX - wifeRowTotalW / 2
-      for (const m of wives) {
-        const wifeY = personY + WIFE_ROW_OFFSET
-        positions.set(`wife-${m.id}`, { x: wx, y: wifeY })
+    // Childless wives: float to the right of the person node at the wife row Y.
+    // They contribute zero to subtreeWidth so they don't displace any children.
+    if (wivesNoKids.length > 0) {
+      let wx = personX + NODE_W + H_GAP * 2
+      for (const m of wivesNoKids) {
+        positions.set(`wife-${m.id}`, { x: wx, y: personY + WIFE_ROW_OFFSET })
         wx += WIFE_W + WIFE_H_GAP
+      }
+    }
+
+    if (children.length === 0) {
+      // No children: wives-with-kids (rare) centred under person; then return
+      if (wivesWithKids.length > 0) {
+        const wifeRowW = wivesWithKids.length * (WIFE_W + WIFE_H_GAP) - WIFE_H_GAP
+        let wx = centreX - wifeRowW / 2
+        for (const m of wivesWithKids) {
+          positions.set(`wife-${m.id}`, { x: wx, y: personY + WIFE_ROW_OFFSET })
+          wx += WIFE_W + WIFE_H_GAP
+        }
       }
       return
     }
 
-    // Place wife groups and their children
+    // Place wife-with-children groups and their children
     let currentX = leftBound
 
-    for (let i = 0; i < wives.length; i++) {
-      const m = wives[i]
+    for (let i = 0; i < wivesWithKids.length; i++) {
+      const m = wivesWithKids[i]
       const groupChildren = byMother?.get(m.wife_id) ?? []
       const childGroupW = groupChildren.reduce((s, c) => s + subtreeWidth(c), 0)
       const groupW = Math.max(WIFE_W + WIFE_H_GAP, childGroupW)
@@ -278,13 +303,13 @@ self.onmessage = (event: MessageEvent<LayoutWorkerInput>): void => {
         childX += subtreeWidth(childId)
       }
 
-      currentX += groupW + (i < wives.length - 1 ? GROUP_GAP : 0)
+      currentX += groupW + (i < wivesWithKids.length - 1 ? GROUP_GAP : 0)
     }
 
     // Place unknown-mother children after all wife groups
     const unknownChildren = byMother?.get(null) ?? []
     if (unknownChildren.length > 0) {
-      if (wives.length > 0) currentX += GROUP_GAP
+      if (wivesWithKids.length > 0) currentX += GROUP_GAP
       for (const childId of unknownChildren) {
         assignPositions(childId, currentX)
         currentX += subtreeWidth(childId)
@@ -292,11 +317,51 @@ self.onmessage = (event: MessageEvent<LayoutWorkerInput>): void => {
     }
   }
 
-  // Lay out each root subtree side by side
+  // Lay out each main-root subtree side by side
   let rootLeft = 0
   for (const root of roots) {
     assignPositions(root.id, rootLeft)
     rootLeft += subtreeWidth(root.id) + ROOT_GAP
+  }
+
+  // ── Step 5b: Place satellite roots adjacent to their spouse ───────────────
+  // Satellite roots (e.g. Ali ibn Abi Talib) have no children in the dataset
+  // so they'd otherwise appear as isolated nodes far from the main tree.
+  // We place them at the same Y as their spouse, just to the left.
+  for (const sat of satelliteRoots) {
+    if (positions.has(sat.id)) continue
+
+    // Case A: satellite is a HUSBAND — look for his wives in the main tree
+    const satMarriages = wivesOf.get(sat.id) ?? []
+    let placed = false
+    for (const m of satMarriages) {
+      const spousePos = positions.get(m.wife_id)
+      if (spousePos) {
+        positions.set(sat.id, {
+          x: spousePos.x - NODE_W - H_GAP * 4,
+          y: spousePos.y,
+        })
+        placed = true
+        break
+      }
+    }
+
+    // Case B: satellite is a WIFE in someone else's marriage
+    if (!placed) {
+      outer: for (const [, ms] of wivesOf.entries()) {
+        for (const m of ms) {
+          if (m.wife_id === sat.id && positions.has(m.husband_id)) {
+            const hPos = positions.get(m.husband_id)!
+            positions.set(sat.id, {
+              x: hPos.x - NODE_W - H_GAP * 4,
+              y: hPos.y,
+            })
+            placed = true
+            break outer
+          }
+        }
+      }
+    }
   }
 
   // ── Step 6: Emit LayoutNodes ──────────────────────────────────────────────
@@ -321,8 +386,7 @@ self.onmessage = (event: MessageEvent<LayoutWorkerInput>): void => {
     if (!hPos) continue
 
     for (const m of marriages_) {
-      const wifePerson =
-        lateralMap.get(m.wife_id) ?? personMap.get(m.wife_id)
+      const wifePerson = lateralMap.get(m.wife_id) ?? personMap.get(m.wife_id)
       if (!wifePerson) continue
 
       const wifeNodeId = `wife-${m.id}`
@@ -378,7 +442,7 @@ self.onmessage = (event: MessageEvent<LayoutWorkerInput>): void => {
         // draw a marriage arc between her PersonNodeCard and her husband
         outputEdges.push({
           id: `marriagearc-${m.id}`,
-          source: m.wife_id,   // her person node
+          source: m.wife_id, // her person node
           target: husbandId,
           type: 'marriageArc',
           data: { marriageDate: m.date_hijri },

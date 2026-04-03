@@ -102,9 +102,9 @@ export type LayoutWorkerInput = {
 
 export type LayoutNode = {
   id: string
-  type: 'person' | 'spouse' | 'junction' | 'bracket'
+  type: 'person' | 'spouse' | 'junction' | 'bracket' | 'wife'
   position: { x: number; y: number }
-  data: PersonNodeData | SpouseNodeData | JunctionNodeData | BracketNodeData
+  data: PersonNodeData | SpouseNodeData | JunctionNodeData | BracketNodeData | WifeNodeData
 }
 
 export type LayoutWorkerOutput = {

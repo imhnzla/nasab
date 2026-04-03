@@ -34,13 +34,7 @@ const TreeCanvasRadial = dynamic(
     loading: () => <div className="h-full w-full" style={{ background: COLOUR.void }} />,
   }
 )
-const TreeCanvas3D = dynamic(
-  () => import('@/components/tree/TreeCanvas3D').then((m) => ({ default: m.TreeCanvas3D })),
-  {
-    ssr: false,
-    loading: () => <div className="h-full w-full" style={{ background: COLOUR.void }} />,
-  }
-)
+// TreeCanvas3D lives on the 3D branch only — not included in premium-2d
 
 type TreePageClientInnerProps = {
   persons: PersonRow[]
@@ -173,7 +167,6 @@ function TopBar({
   onToggleWives,
   onToggleDaughters,
   onSearchClick,
-  onSwitchTo3D,
   treeContainerRef,
   totalPersons,
 }: {
@@ -183,7 +176,6 @@ function TopBar({
   onToggleWives: () => void
   onToggleDaughters: () => void
   onSearchClick: () => void
-  onSwitchTo3D: () => void
   treeContainerRef: React.RefObject<HTMLDivElement | null>
   totalPersons: number
 }): React.ReactElement {
@@ -329,21 +321,6 @@ function TopBar({
           Daughters {showDaughters ? '●' : '○'}
         </button>
 
-        {/* 3D toggle */}
-        {viewMode !== '3d' && (
-          <button
-            type="button"
-            onClick={onSwitchTo3D}
-            style={{
-              ...btnBase,
-              border: `1px solid ${COLOUR.dust}40`,
-              color: `${COLOUR.dust}90`,
-            }}
-          >
-            ✦ 3D
-          </button>
-        )}
-
         {/* Export */}
         <ExportButton treeContainerRef={treeContainerRef} filename="nasab-tree.png" />
       </div>
@@ -363,7 +340,7 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [showWives, setShowWives] = useState(true)
   const [showDaughters, setShowDaughters] = useState(true)
-  const [viewMode, setViewMode] = useState<'2d' | '3d' | 'radial' | 'accessible'>('2d')
+  const [viewMode, setViewMode] = useState<'2d' | 'radial' | 'accessible'>('2d')
   const [pathHighlightIds, setPathHighlightIds] = useState<Set<string>>(new Set())
 
   // Collapse state persisted in localStorage
@@ -547,19 +524,6 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
     return { displayNodes: filteredNodes, displayEdges: filteredEdges }
   }, [nodes, edges, showWives, showDaughters, collapsedIds, toggleCollapse, pathHighlightIds])
 
-  // ── 3D mode: full-page ──────────────────────────────────────────────────────
-  if (viewMode === '3d') {
-    return (
-      <div className="h-screen w-full">
-        <TreeCanvas3D
-          persons={persons}
-          marriages={marriages}
-          onSwitchTo2D={() => setViewMode('2d')}
-        />
-      </div>
-    )
-  }
-
   // ── Main 2D / Radial / Accessible ──────────────────────────────────────────
   return (
     <div className="flex h-screen flex-col overflow-hidden" style={{ background: COLOUR.void }}>
@@ -570,7 +534,6 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
         onToggleWives={() => setShowWives((v) => !v)}
         onToggleDaughters={() => setShowDaughters((v) => !v)}
         onSearchClick={() => setIsSearchOpen(true)}
-        onSwitchTo3D={() => setViewMode('3d')}
         treeContainerRef={treeContainerRef}
         totalPersons={persons.length}
       />

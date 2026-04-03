@@ -1,16 +1,18 @@
-// Web Worker — hierarchical layout for the NASAB family tree
-// Phase 1 (Features 1–5): persons + marriages → positioned nodes + edges
+// Web Worker — Premium 2D layout for the NASAB family tree
 //
-// Outputs:
-// - person nodes (rectangular, or oval for female)
-// - spouse nodes (oval, offset right of husband)
-// - junction nodes (invisible midpoints between husband+wife)
-// - bracket nodes (mother-label above her children group)
-// - smoothstep edges (parent → child)
-// - marriage edges (husband → junction, wife → junction)
-// - crossMarriage edges (husband ↔ wife from different branches, floating arc)
+// Algorithm: Modified Reingold-Tilford with inline wife nodes
+//
+// Key design decisions:
+//   • "Lateral entries" (father_id=null, generation=null) are wives/in-laws
+//     who connect via marriage only — they render as WifeNodeCard, not PersonNodeCard
+//   • Children are grouped by mother (mother_id field) under their mother's wife card
+//   • Multiple patrilineal roots (e.g. the Prophet + Ali ibn Abi Talib) are laid
+//     out side-by-side with ROOT_GAP between them
+//   • Subtree widths are computed bottom-up; X positions assigned top-down
+//   • Y = (generation - 1) * LANE_HEIGHT for person rows
+//   • Y = personY + WIFE_ROW_OFFSET for wife card rows
 
-// ─── Inline types (worker cannot import from lib/) ───────────────────────────
+// ─── Inline types (worker cannot import from lib/) ────────────────────────────
 export type PersonRow = {
   id: string
   name_ar: string
@@ -53,7 +55,7 @@ export type MarriageRow = {
 
 export type LayoutNode = {
   id: string
-  type: 'person' | 'spouse' | 'junction' | 'bracket'
+  type: 'person' | 'wife'
   position: { x: number; y: number }
   data: Record<string, unknown>
 }
@@ -62,7 +64,7 @@ export type LayoutEdge = {
   id: string
   source: string
   target: string
-  type: 'smoothstep' | 'marriage' | 'crossMarriage'
+  type: 'parentChild' | 'fatherToWife' | 'wifeToChild' | 'marriageArc'
   data?: Record<string, unknown>
 }
 
@@ -76,108 +78,26 @@ export type LayoutWorkerOutput = {
   edges: LayoutEdge[]
 }
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-const NODE_WIDTH = 180
-const NODE_HEIGHT = 64
-const H_GAP = 24 // horizontal gap between siblings
-const V_GAP = 48 // vertical gap between generations
-const SPOUSE_OFFSET_X = NODE_WIDTH + 80 // wife column right of husband
-const SPOUSE_V_GAP = NODE_HEIGHT + 28 // vertical stacking between wives
-const JUNCTION_OFFSET_Y = NODE_HEIGHT + 32 // junction below husband/wife midpoint
-const BRACKET_OFFSET_Y = 30 // bracket above children row
-const SPOUSE_SUBTREE_EXTRA = NODE_WIDTH + 100 // extra width per married node
+// ─── Layout constants (must mirror lib/tree/constants2d.ts) ──────────────────
+const NODE_W        = 160
+const NODE_H        = 96
+const WIFE_W        = 120
+const LANE_HEIGHT   = 240
+const WIFE_ROW_OFFSET = 110
+const H_GAP         = 24
+const WIFE_H_GAP    = 12
+const GROUP_GAP     = 44
+const ROOT_GAP      = 200
 
-// ─── Hierarchy types ─────────────────────────────────────────────────────────
-type HierarchyNode = {
-  id: string
-  x: number
-  y: number
-  data: PersonRow
-  parent: HierarchyNode | null
-  children: HierarchyNode[]
-  marriageCount: number // number of wives — widens subtree
-}
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-// ─── Build tree hierarchy from persons ───────────────────────────────────────
-function buildHierarchy(
-  persons: PersonRow[],
-  marriages: MarriageRow[],
-): HierarchyNode | null {
-  if (persons.length === 0) return null
-
-  // Count marriages per husband to widen their subtree
-  const marriageCountByHusband = new Map<string, number>()
-  for (const m of marriages) {
-    marriageCountByHusband.set(m.husband_id, (marriageCountByHusband.get(m.husband_id) ?? 0) + 1)
-  }
-
-  const map = new Map<string, HierarchyNode>()
-  for (const p of persons) {
-    map.set(p.id, {
-      id: p.id,
-      x: 0,
-      y: 0,
-      data: p,
-      parent: null,
-      children: [],
-      marriageCount: marriageCountByHusband.get(p.id) ?? 0,
-    })
-  }
-
-  let root: HierarchyNode | null = null
-  for (const p of persons) {
-    const node = map.get(p.id)!
-    if (p.father_id && map.has(p.father_id)) {
-      const parent = map.get(p.father_id)!
-      node.parent = parent
-      parent.children.push(node)
-    } else {
-      if (!root) root = node
-    }
-  }
-  return root
-}
-
-// ─── Compute subtree width (accounting for spouse columns) ───────────────────
-function subtreeWidth(node: HierarchyNode): number {
-  const nodeSize = NODE_WIDTH + H_GAP
-  const extra = node.marriageCount > 0 ? SPOUSE_SUBTREE_EXTRA : 0
-  if (node.children.length === 0) return nodeSize + extra
-
-  const childTotal = node.children.reduce((sum, c) => sum + subtreeWidth(c), 0)
-  return Math.max(nodeSize + extra, childTotal)
-}
-
-// ─── Place all person nodes ───────────────────────────────────────────────────
-function placeNode(node: HierarchyNode, depth: number, left: number): void {
-  node.y = depth * (NODE_HEIGHT + V_GAP)
-
-  if (node.children.length === 0) {
-    node.x = left + NODE_WIDTH / 2
-    return
-  }
-
-  let childLeft = left
-  for (const child of node.children) {
-    const w = subtreeWidth(child)
-    placeNode(child, depth + 1, childLeft)
-    childLeft += w
-  }
-
-  const first = node.children[0]
-  const last = node.children[node.children.length - 1]
-  node.x = (first.x + last.x) / 2
-}
-
-function collectPersonNodes(root: HierarchyNode): HierarchyNode[] {
-  const result: HierarchyNode[] = []
-  const queue: HierarchyNode[] = [root]
-  while (queue.length > 0) {
-    const n = queue.shift()!
-    result.push(n)
-    for (const c of n.children) queue.push(c)
-  }
-  return result
+/** A "lateral entry" connects to the tree only via marriage (not patrilineal descent).
+ *  Characteristics: no father_id in the dataset AND no generation assigned.
+ *  These persons render as WifeNodeCard beside their husband, not as PersonNodeCard. */
+function isLateralEntry(p: PersonRow, personMap: Map<string, PersonRow>): boolean {
+  if (p.generation !== null && p.generation !== undefined) return false
+  if (p.father_id && personMap.has(p.father_id)) return false
+  return true
 }
 
 // ─── Main message handler ─────────────────────────────────────────────────────
@@ -189,218 +109,305 @@ self.onmessage = (event: MessageEvent<LayoutWorkerInput>): void => {
     return
   }
 
-  if (persons.length === 1) {
-    const p = persons[0]
-    self.postMessage({
-      nodes: [{
-        id: p.id,
-        type: 'person',
-        position: { x: 0, y: 0 },
-        data: { person: p }
-      }],
-      edges: [],
-    } satisfies LayoutWorkerOutput)
-    return
+  // ── Step 1: Build lookup maps ───────────────────────────────────────────────
+  const personMap = new Map<string, PersonRow>(persons.map((p) => [p.id, p]))
+
+  // Separate lateral entries from tree persons
+  const treePersons = persons.filter((p) => !isLateralEntry(p, personMap))
+  const lateralMap = new Map<string, PersonRow>(
+    persons.filter((p) => isLateralEntry(p, personMap)).map((p) => [p.id, p])
+  )
+
+  // childrenOf[fatherId] → sorted child IDs (by generation, then name for stability)
+  const childrenOf = new Map<string, string[]>()
+  for (const p of treePersons) {
+    if (p.father_id && personMap.has(p.father_id)) {
+      if (!childrenOf.has(p.father_id)) childrenOf.set(p.father_id, [])
+      childrenOf.get(p.father_id)!.push(p.id)
+    }
   }
 
-  // ── Pass 1: place person nodes ──────────────────────────────────────────
-  const root = buildHierarchy(persons, marriages)
-  if (!root) {
-    self.postMessage({ nodes: [], edges: [] } satisfies LayoutWorkerOutput)
-    return
-  }
-
-  placeNode(root, 0, 0)
-  const allPersonNodes = collectPersonNodes(root)
-
-  // Build position map: personId → {x, y}
-  const posMap = new Map<string, { x: number; y: number }>()
-  for (const n of allPersonNodes) posMap.set(n.id, { x: n.x, y: n.y })
-
-  // Build person data map
-  const personMap = new Map<string, PersonRow>()
-  for (const p of persons) personMap.set(p.id, p)
-
-  // ── Pass 2: group marriages by husband ──────────────────────────────────
-  const marriagesByHusband = new Map<string, MarriageRow[]>()
+  // wivesOf[husbandId] → marriages sorted by order_num
+  const wivesOf = new Map<string, MarriageRow[]>()
   for (const m of marriages) {
-    if (!marriagesByHusband.has(m.husband_id)) marriagesByHusband.set(m.husband_id, [])
-    marriagesByHusband.get(m.husband_id)!.push(m)
+    if (!wivesOf.has(m.husband_id)) wivesOf.set(m.husband_id, [])
+    wivesOf.get(m.husband_id)!.push(m)
   }
-
-  // Sort each husband's wives by order_num
-  for (const list of marriagesByHusband.values()) {
+  for (const list of wivesOf.values()) {
     list.sort((a, b) => a.order_num - b.order_num)
   }
 
-  // ── Pass 3: compute spouse / junction / bracket positions ───────────────
+  // ── Step 2: Group each person's children by their mother ───────────────────
+  // childrenByMother[personId][wifeId | null] → childIds
+  const childrenByMother = new Map<string, Map<string | null, string[]>>()
+
+  function buildChildGroups(personId: string): void {
+    const children = childrenOf.get(personId) ?? []
+    const wives = wivesOf.get(personId) ?? []
+
+    const byMother = new Map<string | null, string[]>()
+    // Pre-populate slots for known wives (preserves order_num ordering)
+    for (const m of wives) byMother.set(m.wife_id, [])
+    byMother.set(null, []) // slot for children with unknown/unlisted mother
+
+    for (const childId of children) {
+      const child = personMap.get(childId)
+      const motherWifeId = child?.mother_id ?? null
+      // Only group under a wife if she is one of this person's listed wives
+      const key = motherWifeId && byMother.has(motherWifeId) ? motherWifeId : null
+      if (!byMother.has(key)) byMother.set(key, [])
+      byMother.get(key)!.push(childId)
+    }
+
+    childrenByMother.set(personId, byMother)
+    for (const childId of children) buildChildGroups(childId)
+  }
+
+  // ── Step 3: Find all patrilineal roots ────────────────────────────────────
+  // A root is a tree person with no father in the dataset.
+  // Multiple roots are laid out side-by-side (e.g. Prophet + Ali ibn Abi Talib).
+  const roots = treePersons.filter(
+    (p) => !(p.father_id && personMap.has(p.father_id))
+  )
+
+  // Sort roots by generation (ascending), then name for stability
+  roots.sort((a, b) => (a.generation ?? 1) - (b.generation ?? 1) || a.name_en.localeCompare(b.name_en))
+
+  for (const root of roots) buildChildGroups(root.id)
+
+  // ── Step 4: Compute subtree widths (bottom-up) ────────────────────────────
+  const widthCache = new Map<string, number>()
+
+  function subtreeWidth(personId: string): number {
+    const cached = widthCache.get(personId)
+    if (cached !== undefined) return cached
+
+    const children = childrenOf.get(personId) ?? []
+    const wives = wivesOf.get(personId) ?? []
+    const byMother = childrenByMother.get(personId)
+
+    if (children.length === 0) {
+      // No children: width = max(own card, wife card row)
+      const wifeRowW =
+        wives.length > 0
+          ? wives.length * (WIFE_W + WIFE_H_GAP) - WIFE_H_GAP
+          : 0
+      const w = Math.max(NODE_W + H_GAP, wifeRowW + H_GAP)
+      widthCache.set(personId, w)
+      return w
+    }
+
+    let totalW = 0
+
+    // Width for each wife's sibling group
+    for (let i = 0; i < wives.length; i++) {
+      const m = wives[i]
+      const groupChildren = byMother?.get(m.wife_id) ?? []
+      const childGroupW = groupChildren.reduce((s, c) => s + subtreeWidth(c), 0)
+      const groupW = Math.max(WIFE_W + WIFE_H_GAP, childGroupW)
+      totalW += groupW
+      if (i < wives.length - 1) totalW += GROUP_GAP
+    }
+
+    // Width for unknown-mother children
+    const unknownChildren = byMother?.get(null) ?? []
+    const unknownW = unknownChildren.reduce((s, c) => s + subtreeWidth(c), 0)
+    if (unknownW > 0) {
+      if (wives.length > 0) totalW += GROUP_GAP
+      totalW += unknownW
+    }
+
+    const w = Math.max(NODE_W + H_GAP, totalW + H_GAP)
+    widthCache.set(personId, w)
+    return w
+  }
+
+  for (const root of roots) subtreeWidth(root.id)
+
+  // ── Step 5: Assign X/Y positions (top-down) ───────────────────────────────
+  // positions[id] = top-left {x, y} for React Flow
+  const positions = new Map<string, { x: number; y: number }>()
+
+  function assignPositions(personId: string, leftBound: number): void {
+    const person = personMap.get(personId)!
+    const gen = person.generation ?? 1
+    const totalW = subtreeWidth(personId)
+    const children = childrenOf.get(personId) ?? []
+    const wives = wivesOf.get(personId) ?? []
+    const byMother = childrenByMother.get(personId)
+
+    // Person card: top-left = (centreX - NODE_W/2, (gen-1)*LANE_HEIGHT)
+    const centreX = leftBound + totalW / 2
+    const personX = centreX - NODE_W / 2
+    const personY = (gen - 1) * LANE_HEIGHT
+    positions.set(personId, { x: personX, y: personY })
+
+    if (children.length === 0 && wives.length === 0) return
+
+    // If this person has wives but no children, still place wife cards
+    if (children.length === 0 && wives.length > 0) {
+      const wifeRowTotalW = wives.length * (WIFE_W + WIFE_H_GAP) - WIFE_H_GAP
+      let wx = centreX - wifeRowTotalW / 2
+      for (const m of wives) {
+        const wifeY = personY + WIFE_ROW_OFFSET
+        positions.set(`wife-${m.id}`, { x: wx, y: wifeY })
+        wx += WIFE_W + WIFE_H_GAP
+      }
+      return
+    }
+
+    // Place wife groups and their children
+    let currentX = leftBound
+
+    for (let i = 0; i < wives.length; i++) {
+      const m = wives[i]
+      const groupChildren = byMother?.get(m.wife_id) ?? []
+      const childGroupW = groupChildren.reduce((s, c) => s + subtreeWidth(c), 0)
+      const groupW = Math.max(WIFE_W + WIFE_H_GAP, childGroupW)
+
+      // Wife card: centred over her children group
+      const wifeX = currentX + groupW / 2 - WIFE_W / 2
+      const wifeY = personY + WIFE_ROW_OFFSET
+      positions.set(`wife-${m.id}`, { x: wifeX, y: wifeY })
+
+      // Place children centred under wife card
+      const childStartX = currentX + Math.max(0, (groupW - childGroupW) / 2)
+      let childX = childStartX
+      for (const childId of groupChildren) {
+        assignPositions(childId, childX)
+        childX += subtreeWidth(childId)
+      }
+
+      currentX += groupW + (i < wives.length - 1 ? GROUP_GAP : 0)
+    }
+
+    // Place unknown-mother children after all wife groups
+    const unknownChildren = byMother?.get(null) ?? []
+    if (unknownChildren.length > 0) {
+      if (wives.length > 0) currentX += GROUP_GAP
+      for (const childId of unknownChildren) {
+        assignPositions(childId, currentX)
+        currentX += subtreeWidth(childId)
+      }
+    }
+  }
+
+  // Lay out each root subtree side by side
+  let rootLeft = 0
+  for (const root of roots) {
+    assignPositions(root.id, rootLeft)
+    rootLeft += subtreeWidth(root.id) + ROOT_GAP
+  }
+
+  // ── Step 6: Emit LayoutNodes ──────────────────────────────────────────────
   const outputNodes: LayoutNode[] = []
   const outputEdges: LayoutEdge[] = []
 
-  // motherBranch lookup: childId → wife branch
-  const motherBranchMap = new Map<string, PersonRow['branch']>()
-  for (const p of persons) {
-    if (p.mother_id) {
-      const mother = personMap.get(p.mother_id)
-      if (mother) motherBranchMap.set(p.id, mother.branch)
-    }
+  // Person nodes
+  for (const p of treePersons) {
+    const pos = positions.get(p.id)
+    if (!pos) continue
+    outputNodes.push({
+      id: p.id,
+      type: 'person',
+      position: pos,
+      data: { person: p },
+    })
   }
 
-  for (const [husbandId, wifeMarriages] of marriagesByHusband.entries()) {
-    const hPos = posMap.get(husbandId)
+  // Wife nodes (lateral entries placed beside their husband)
+  for (const [husbandId, marriages_] of wivesOf.entries()) {
+    const hPos = positions.get(husbandId)
     if (!hPos) continue
 
-    const husband = personMap.get(husbandId)
-
-    for (const marriage of wifeMarriages) {
-      const wifePerson = personMap.get(marriage.wife_id)
+    for (const m of marriages_) {
+      const wifePerson =
+        lateralMap.get(m.wife_id) ?? personMap.get(m.wife_id)
       if (!wifePerson) continue
 
-      const orderIndex = marriage.order_num - 1
-      const wifeX = hPos.x + SPOUSE_OFFSET_X
-      const wifeY = hPos.y + orderIndex * SPOUSE_V_GAP
+      const wifeNodeId = `wife-${m.id}`
 
-      const spouseNodeId = `spouse-${marriage.wife_id}`
-      outputNodes.push({
-        id: spouseNodeId,
-        type: 'spouse',
-        position: { x: wifeX, y: wifeY },
-        data: {
-          person: wifePerson,
-          marriageId: marriage.id,
-          marriageDate: marriage.date_hijri,
-          order: marriage.order_num,
-        },
-      })
-
-      const junctionId = `junction-${marriage.id}`
-      const junctionX = (hPos.x + wifeX) / 2
-      const junctionY = wifeY + JUNCTION_OFFSET_Y
-      outputNodes.push({
-        id: junctionId,
-        type: 'junction',
-        position: { x: junctionX, y: junctionY },
-        data: {
-          husbandId,
-          wifeId: marriage.wife_id,
-          marriageId: marriage.id,
-        },
-      })
-
-      // Cross-branch vs same-branch marriage edge
-      const isCrossBranch = husband?.branch !== wifePerson.branch
-      if (isCrossBranch) {
-        outputEdges.push({
-          id: `crossmarriage-${marriage.id}`,
-          source: husbandId,
-          target: spouseNodeId,
-          type: 'crossMarriage',
-          data: {
-            marriageId: marriage.id,
-            marriageDate: marriage.date_hijri,
-          },
-        })
-      } else {
-        outputEdges.push({
-          id: `marriage-h-${marriage.id}`,
-          source: husbandId,
-          target: junctionId,
-          type: 'marriage',
-          data: {
-            marriageId: marriage.id,
-            order: marriage.order_num,
-            side: 'husband'
-          },
-        })
-        outputEdges.push({
-          id: `marriage-w-${marriage.id}`,
-          source: spouseNodeId,
-          target: junctionId,
-          type: 'marriage',
-          data: {
-            marriageId: marriage.id,
-            order: marriage.order_num,
-            side: 'wife'
-          },
-        })
+      // Use pre-computed position if available; fall back to inline placement
+      const wPos = positions.get(wifeNodeId) ?? {
+        x: hPos.x + NODE_W + 16 + (m.order_num - 1) * (WIFE_W + WIFE_H_GAP),
+        y: hPos.y + WIFE_ROW_OFFSET,
       }
 
-      // Children of this marriage: persons whose marriage_id matches
-      const marriageChildren = persons.filter(
-        (p) => p.marriage_id === marriage.id && posMap.has(p.id)
-      )
+      // Only emit as wife node if:
+      //   (a) person is a lateral entry, OR
+      //   (b) person is a tree person but we have a position slot for them as wife
+      //       (i.e. they appear in both the tree AND as a wife — e.g. Fatimah)
+      const isLateral = lateralMap.has(m.wife_id)
+      const isTreePersonWife = !isLateral && positions.has(m.wife_id)
 
-      // Replace smoothstep edges from father → child with junction → child
-      for (const child of marriageChildren) {
-        outputEdges.push({
-          id: `parentchild-${junctionId}-${child.id}`,
-          source: junctionId,
-          target: child.id,
-          type: 'smoothstep',
-          data: { marriageId: marriage.id },
-        })
-      }
-
-      // Bracket node above this wife's children group
-      if (marriageChildren.length > 0) {
-        const childPositions = marriageChildren
-          .map((c) => posMap.get(c.id)!)
-          .filter(Boolean)
-
-        const leftmost = Math.min(...childPositions.map((p) => p.x - NODE_WIDTH / 2))
-        const rightmost = Math.max(...childPositions.map((p) => p.x + NODE_WIDTH / 2))
-        const childY = childPositions[0].y
-        const spanPx = rightmost - leftmost
-
+      if (isLateral) {
         outputNodes.push({
-          id: `bracket-${marriage.id}`,
-          type: 'bracket',
-          position: { x: leftmost, y: childY - BRACKET_OFFSET_Y },
+          id: wifeNodeId,
+          type: 'wife',
+          position: wPos,
           data: {
-            motherName_ar: wifePerson.name_ar,
-            motherName_en: wifePerson.name_en,
-            motherBranch: wifePerson.branch,
-            spanPx,
+            person: wifePerson,
+            marriageId: m.id,
+            marriageDate: m.date_hijri,
+            orderNum: m.order_num,
           },
+        })
+
+        // Father → wife connector edge
+        outputEdges.push({
+          id: `ftw-${m.id}`,
+          source: husbandId,
+          target: wifeNodeId,
+          type: 'fatherToWife',
+          data: { orderNum: m.order_num },
+        })
+
+        // Wife → each of her children
+        const byMother = childrenByMother.get(husbandId)
+        const wifeChildren = byMother?.get(m.wife_id) ?? []
+        for (const childId of wifeChildren) {
+          outputEdges.push({
+            id: `wtc-${m.id}-${childId}`,
+            source: wifeNodeId,
+            target: childId,
+            type: 'wifeToChild',
+          })
+        }
+      } else if (isTreePersonWife) {
+        // Tree person who is ALSO a wife (e.g. Fatimah al-Zahra):
+        // draw a marriage arc between her PersonNodeCard and her husband
+        outputEdges.push({
+          id: `marriagearc-${m.id}`,
+          source: m.wife_id,   // her person node
+          target: husbandId,
+          type: 'marriageArc',
+          data: { marriageDate: m.date_hijri },
         })
       }
     }
   }
 
-  // Set of children already connected via junction (skip plain father edge for those)
-  const junctionChildIds = new Set<string>(
-    persons
-      .filter((p) => p.marriage_id !== null)
-      .map((p) => p.id)
-  )
-
-  // ── Pass 4: emit all person nodes + standard parent-child edges ──────────
-  for (const n of allPersonNodes) {
-    const mb = motherBranchMap.get(n.id) ?? null
-
-    outputNodes.push({
-      id: n.id,
-      type: 'person',
-      position: { x: n.x, y: n.y },
-      data: {
-        person: n.data,
-        motherBranch: mb,
-      },
-    })
-
-    // Standard father→child edge — skip if child has a junction edge
-    if (n.parent && !junctionChildIds.has(n.id)) {
-      outputEdges.push({
-        id: `e-${n.parent.id}-${n.id}`,
-        source: n.parent.id,
-        target: n.id,
-        type: 'smoothstep',
-      })
+  // ── Step 7: Parent-child edges ────────────────────────────────────────────
+  // Connect father → child for children not already connected via a wife node
+  const wiredChildren = new Set<string>()
+  for (const [, marriages_] of wivesOf.entries()) {
+    for (const m of marriages_) {
+      const byMother = childrenByMother.get(m.husband_id)
+      const wifeChildren = byMother?.get(m.wife_id) ?? []
+      for (const c of wifeChildren) wiredChildren.add(c)
     }
   }
 
-  self.postMessage({
-    nodes: outputNodes,
-    edges: outputEdges
-  } satisfies LayoutWorkerOutput)
+  for (const p of treePersons) {
+    if (!p.father_id || !positions.has(p.id)) continue
+    if (wiredChildren.has(p.id)) continue // already wired via wife node
+    outputEdges.push({
+      id: `pc-${p.father_id}-${p.id}`,
+      source: p.father_id,
+      target: p.id,
+      type: 'parentChild',
+    })
+  }
+
+  self.postMessage({ nodes: outputNodes, edges: outputEdges } satisfies LayoutWorkerOutput)
 }

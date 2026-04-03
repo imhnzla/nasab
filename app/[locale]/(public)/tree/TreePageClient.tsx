@@ -112,7 +112,7 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
   const [selectedPerson, setSelectedPerson] = useState<PersonRow | null>(null)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [showWives, setShowWives] = useState(true)
-  const [viewMode, setViewMode] = useState<'2d' | '3d' | 'radial' | 'accessible'>('3d')
+  const [viewMode, setViewMode] = useState<'2d' | '3d' | 'radial' | 'accessible'>('2d')
   const [showTimeline, setShowTimeline] = useState(false)
   const [pathHighlightIds, setPathHighlightIds] = useState<Set<string>>(new Set())
   const [scrollY, setScrollY] = useState(0)
@@ -202,7 +202,7 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
     (personId: string) => {
       const node = nodes.find((n) => n.id === personId)
       if (node) {
-        setCenter(node.position.x + 90, node.position.y + 32, { zoom: 1.4, duration: 700 })
+        setCenter(node.position.x + 80, node.position.y + 48, { zoom: 1.4, duration: 700 })
       }
       const person = persons.find((p) => p.id === personId) ?? null
       setSelectedPerson(person)
@@ -244,12 +244,13 @@ function TreePageClientInner({ persons, marriages }: TreePageClientInnerProps): 
 
   // Combined memo: filter by showWives + inject collapse callbacks + hide collapsed subtrees
   const { displayNodes, displayEdges } = useMemo(() => {
-    // Step 1: filter spouses when showWives is off
+    // Step 1: filter wife nodes when showWives is off
+    // Handles both old types (spouse/junction/bracket) and new type (wife)
     let filteredNodes: AnyFlowNode[] = showWives ? nodes : nodes.filter((n) => n.type === 'person')
 
     let filteredEdges: FamilyEdge[] = showWives
       ? edges
-      : edges.filter((e) => e.type === 'smoothstep')
+      : edges.filter((e) => e.type === 'smoothstep' || e.type === 'parentChild')
 
     // Step 2: inject collapse callbacks into person nodes
     const childrenOf = buildChildrenMap(filteredEdges)

@@ -24,9 +24,9 @@ export type Branch = NonNullable<PersonRow['branch']>
 export type ScholarlyTradition = NonNullable<PersonRow['scholarly_tradition']>
 
 export const BRANCH_COLOURS: Record<Branch, string> = {
-  hasanid: '#1B5E20',
-  husaynid: '#0D1B2A',
-  hashemite: '#C9A84C',
+  hasanid: '#C9943A',
+  husaynid: '#1A5C3A',
+  hashemite: '#8B4513',
 }
 
 export const NODE_WIDTH = 180
@@ -65,14 +65,29 @@ export type BracketNodeData = {
   spanPx: number
 }
 
+// ─── Wife node data (premium 2D layout) ─────────────────────────────────────
+
+export type WifeNodeData = {
+  person: PersonRow
+  marriageId: string
+  marriageDate: string | null
+  orderNum: number
+}
+
 // ─── Flow node types ─────────────────────────────────────────────────────────
 
-export type PersonFlowNode   = Node<PersonNodeData,   'person'>
-export type SpouseFlowNode   = Node<SpouseNodeData,   'spouse'>
+export type PersonFlowNode = Node<PersonNodeData, 'person'>
+export type SpouseFlowNode = Node<SpouseNodeData, 'spouse'>
 export type JunctionFlowNode = Node<JunctionNodeData, 'junction'>
-export type BracketFlowNode  = Node<BracketNodeData,  'bracket'>
+export type BracketFlowNode = Node<BracketNodeData, 'bracket'>
+export type WifeFlowNode = Node<WifeNodeData, 'wife'>
 
-export type AnyFlowNode = PersonFlowNode | SpouseFlowNode | JunctionFlowNode | BracketFlowNode
+export type AnyFlowNode =
+  | PersonFlowNode
+  | SpouseFlowNode
+  | JunctionFlowNode
+  | BracketFlowNode
+  | WifeFlowNode
 
 // ─── Edge types ───────────────────────────────────────────────────────────────
 
